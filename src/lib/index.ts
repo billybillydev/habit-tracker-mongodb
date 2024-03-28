@@ -1,3 +1,5 @@
+import { SessionUser } from "$auth";
+
 export type DateWithCompletion = {
     date: string;
     completed: boolean;
@@ -31,4 +33,11 @@ export function fetchApi<T>(url: string | Request | URL, init?: FetchRequestInit
     const json = fetch(url, init).then((res) => res.json());
     resolve(json);
   });
+}
+
+export async function executeHandlerForSessionUser<T>(handler: (user: SessionUser) => T, user: SessionUser | undefined): Promise<T> {
+  if (!user) {
+    throw new Error("Error session user");
+  }
+  return handler(user);
 }
