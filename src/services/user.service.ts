@@ -1,5 +1,4 @@
 import { eq } from "drizzle-orm";
-import { InternalServerError } from "elysia";
 import { db } from "../db";
 import { InsertUser, userSchema } from "../db/schema";
 
@@ -48,7 +47,7 @@ export const userService = {
       .returning()
       .get();
     if (!result) {
-      throw new InternalServerError("User was not deleted.");
+      throw new Error("User was not deleted.");
     }
 
     return result;
@@ -62,7 +61,7 @@ export const userService = {
       .get();
 
     if (!result) {
-      throw new InternalServerError("User was not created.");
+      throw new Error("User was not created.");
     }
 
     return result;
@@ -90,7 +89,7 @@ export const userService = {
   //     .get(updateObj);
 
   //   if (!result) {
-  //     throw new InternalServerError("User was not updated.");
+  //     throw new Error("User was not updated.");
   //   }
 
   //   return result;
