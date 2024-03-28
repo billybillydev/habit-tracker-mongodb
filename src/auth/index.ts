@@ -2,7 +2,8 @@ import { Google } from "arctic";
 import { config } from "../config";
 import { LibSQLAdapter } from "@lucia-auth/adapter-sqlite";
 import { Lucia } from "lucia";
-import { client, db } from "../db";
+import { User } from "$db/schema";
+import { client } from "$db";
 
 export type GoogleProfile = {
   id: string;
@@ -13,6 +14,12 @@ export type GoogleProfile = {
   picture: string;
   gender: string;
   locale: string;
+};
+
+export type SessionUser = {
+  id: User["id"];
+  name: User["name"];
+  email?: User["email"];
 };
 
 const { credentials, redirectURI } = config.google;
@@ -40,6 +47,7 @@ export const lucia = new Lucia(adapter, {
       // we don't need to expose the hashed password!
       email: attributes.email,
       name: attributes.name,
+      id: attributes.id,
     };
   },
 });
@@ -51,9 +59,6 @@ export const auth = {
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: {
-      email: string;
-      name: string;
-    };
+    DatabaseUserAttributes: SessionUser;
   }
 }
