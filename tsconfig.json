@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "strict": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "types": ["bun-types", "typed-htmx"],
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "$auth": ["src/auth"],
+      "$config": ["src/config"],
+      "$components": ["src/components"],
+      "$components/*": ["src/components/*"],
+      "$db": ["src/db"],
+      "$db/*": ["src/db/*"],
+      "$middlewares": ["src/middlewares"],
+      "$middlewares/*": ["src/middlewares/*"],
+      "$controllers": ["src/controllers"],
+      "$controllers/*": ["src/controllers/*"],
+      "$services": ["src/services"],
+      "$services/*": ["src/services/*"],
+      "$pages": ["src/pages"],
+      "$pages/*": ["src/pages/*"],
+      "$lib": ["src/lib"]
+    }
+  }
+}
