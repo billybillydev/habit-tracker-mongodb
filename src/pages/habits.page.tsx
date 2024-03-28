@@ -1,12 +1,10 @@
-import {
-  CreateHabitComponent,
-  type Habit,
-  Habits,
-} from "../components/habits.component";
-import { RootLayout } from "../components/layouts.component";
-import { Headings, Title } from "../components/headings.component";
-import { SecondaryButton } from "../components/buttons.component";
-import { PageContext } from "../components/base-html.component";
+
+import { PageContext } from "$components/base-html.component";
+import { SecondaryButton } from "$components/buttons.component";
+import { CreateHabitComponent, Habits } from "$components/habits.component";
+import { Headings, Title } from "$components/headings.component";
+import { RootLayout } from "$components/layouts.component";
+import { Habit } from "$db/schema";
 
 export function HabitsPage({
   habits,

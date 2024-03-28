@@ -9,7 +9,7 @@ import { htmxMiddleware } from "$middlewares/htmx.middleware";
 import { sessionMiddleware } from "$middlewares/session.middleware";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
-import { config } from "./config";
+import { config } from "$config";
 
 type Cookie = Partial<{
   google_code_verifier: string;

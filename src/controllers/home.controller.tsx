@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { HomePage } from "../pages/home.page";
 import { AppVariables } from "src";
 import { isAuthMiddleware } from "$middlewares/auth.middleware";
+import { HomePage } from "$pages/home.page";
 
 export const homeController = new Hono<{ Variables: AppVariables }>()
   .use(isAuthMiddleware)

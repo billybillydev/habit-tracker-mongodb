@@ -1,7 +1,7 @@
+import { config } from "$config";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import { config } from "../config";
-import * as schema from "./schema";
+import * as schema from '$db/schema';
 
 const options = (() => {
   switch (config.db.type) {

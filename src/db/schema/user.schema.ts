@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { habitSchema } from "./habit.schema";
+import { habitSchema } from "$db/schema/habit.schema";
 
 export const userSchema = sqliteTable("users", {
   id: text("id").primaryKey().notNull(),

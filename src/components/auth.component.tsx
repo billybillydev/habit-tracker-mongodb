@@ -1,5 +1,5 @@
-import { PrimaryButton } from "./buttons.component";
-import { FormField } from "./fields.component";
+import { PrimaryButton } from "$components/buttons.component";
+import { FormField } from "$components/fields.component";
 
 export function LoginForm() {
   const errorLoginId = "error-login";

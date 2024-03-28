@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "../db";
-import { InsertUser, userSchema } from "../db/schema";
+import { db } from "$db";
+import { userSchema, InsertUser } from "$db/schema";
 
 export const userService = {
   async getById(userId: string) {

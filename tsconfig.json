@@ -8,7 +8,7 @@
     "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "types": ["bun-types", "typed-htmx"],
+    "types": ["bun-types", "typed-html", "typed-htmx"],
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {

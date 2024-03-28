@@ -1,7 +1,7 @@
 import { eq, sql, and } from "drizzle-orm";
-import { db } from "../db";
-import { type Habit, habitHistorySchema, habitSchema, type InsertHabit } from "../db/schema";
-import { generateDatesWithCompletion } from "../lib";
+import { db } from "$db";
+import { habitHistorySchema, habitSchema, Habit, InsertHabit } from "$db/schema";
+import { generateDatesWithCompletion } from "$lib";
 
 export const habitService = {
   history: {
@@ -95,6 +95,9 @@ export const habitService = {
       where: (fields, { eq }) => eq(fields.userId, userId),
       with: {
         histories: true,
+      },
+      orderBy(fields, { desc }) {
+        return desc(fields.created_at);
       },
     });
     return result;

@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { NotificationList } from "./notifications.component";
+import { NotificationList } from "$components/notifications.component";
 
 export type HTMLProps = HTMLElement & {
   title: string;

@@ -1,10 +1,8 @@
 import classNames from "classnames";
 
-export type ButtonProps = Omit<JSX.HtmlButtonTag, "class"> & {
-  children?: JSX.Element | JSX.Element[];
+export type ButtonProps = JSX.HtmlButtonTag & Partial<JSX.ElementChildrenAttribute> & {
   text?: string;
   variant?: "solid";
-  class?: JSX.HtmlButtonTag["class"];
 };
 
 export function Button({

@@ -1,13 +1,9 @@
-import { type Habit } from "../db/schema";
-import { generateDatesByNumberOfDays } from "../lib";
-import {
-  DangerButton,
-  InfoButton,
-  PrimaryButton,
-  SecondaryButton,
-} from "./buttons.component";
-import { FormField } from "./fields.component";
-import { type Notification } from "./notifications.component";
+import { SecondaryButton, PrimaryButton, InfoButton, DangerButton } from "$components/buttons.component";
+import { FormField } from "$components/fields.component";
+import { Notification } from "$components/notifications.component";
+import { Habit } from "$db/schema";
+import { generateDatesByNumberOfDays } from "$lib";
+
 
 export type HabitsProps = { habits: Habit[] };
 
@@ -20,11 +16,12 @@ export function CreateHabitForm() {
       hx-post="/api/habits"
       hx-swap={`afterbegin`}
       hx-target={`#${targetId}`}
+      hx-target-4xx={`#${createHabitErrorMessageId}`}
       hx-target-5xx={`#${createHabitErrorMessageId}`}
       x-ref={createHabitFormRef}
       x-init={`
         $el.addEventListener('htmx:afterRequest', (event) => {
-          if(event.detail.xhr.status === 200){
+          if(event.detail.xhr.status === 201){
             $el.reset();
             showForm = false;
           }
@@ -141,10 +138,10 @@ export function HabitComponent({ item }: { item: Habit }) {
       // hx-target={`#${habitHistories}`}
       // hx-swap="outerHTML"
     >
-      <h2 class={"text-xl font-medium"} safe>
+      <h2 class={"text-xl font-medium"}>
         {item.title}
       </h2>
-      <p class={"text-md text-slate-400"} safe>
+      <p class={"text-md text-slate-400"}>
         {item.description}
       </p>
       {/* <div id={habitHistories} /> */}
@@ -177,6 +174,7 @@ export function HabitComponent({ item }: { item: Habit }) {
           hx-confirm="Are you sure ?"
           x-init={`
             $el.addEventListener("htmx:afterRequest", ({ detail }) => {
+              console.log(detail.xhr.status);
               if (detail.xhr.status === 200) {
                 document.querySelector("#habit-item-${item.id}").remove();
               }

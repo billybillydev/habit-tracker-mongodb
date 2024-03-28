@@ -1,9 +1,9 @@
-import { PageContext } from "../components/base-html.component";
-import { SecondaryButton } from "../components/buttons.component";
-import { Divider } from "../components/divider.component";
-import { Headings, SubTitle, Title } from "../components/headings.component";
-import { RootLayout } from "../components/layouts.component";
-import { SEO } from "../components/seo.component";
+import { PageContext } from "$components/base-html.component";
+import { SecondaryButton } from "$components/buttons.component";
+import { Divider } from "$components/divider.component";
+import { Headings, SubTitle, Title } from "$components/headings.component";
+import { RootLayout } from "$components/layouts.component";
+import { SEO } from "$components/seo.component";
 
 export function HomePage({
   isAuth,
@@ -11,6 +11,7 @@ export function HomePage({
 }: PageContext<{ isAuth?: boolean }>) {
   const title = "Unleash Your Potential";
   const subTitle = "Build Lasting Habits That Stick";
+  
   return (
     <RootLayout
       title={[title, subTitle].join(" : ")}

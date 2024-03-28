@@ -1,9 +1,9 @@
 import { Google } from "arctic";
-import { config } from "../config";
 import { LibSQLAdapter } from "@lucia-auth/adapter-sqlite";
 import { Lucia } from "lucia";
 import { User } from "$db/schema";
 import { client } from "$db";
+import { config } from "$config";
 
 export type GoogleProfile = {
   id: string;

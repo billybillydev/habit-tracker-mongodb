@@ -23,6 +23,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "typed-html": "^3.0.1",
     "typed-htmx": "^0.2.1",
     "drizzle-kit": "^0.19.13",
     "better-sqlite3": "^8.6.0",

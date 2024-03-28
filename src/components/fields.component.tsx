@@ -1,8 +1,8 @@
 export type FormFieldProps = {
   fieldName: string;
-  type?: HTMLInputElement["type"];
+  type?: JSX.HtmlInputTag["type"];
   value?: string;
-  class?: HTMLDivElement["className"];
+  class?: JSX.HtmlInputTag["class"];
 };
 
 export function FormField({
@@ -26,7 +26,7 @@ export function FormField({
         id={fieldName}
         type={type || "text"}
         value={value || ""}
-        required
+        required="true"
       />
     </div>
   );

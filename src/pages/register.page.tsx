@@ -1,7 +1,7 @@
-import { Divider } from "../components/divider.component";
-import { Headings, Title } from "../components/headings.component";
-import { RootLayout } from "../components/layouts.component";
-import { RegisterForm } from "../components/auth.component";
+import { RegisterForm } from "$components/auth.component";
+import { Divider } from "$components/divider.component";
+import { Headings, Title } from "$components/headings.component";
+import { RootLayout } from "$components/layouts.component";
 
 export function RegisterPage() {
   return (

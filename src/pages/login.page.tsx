@@ -1,7 +1,7 @@
-import { Divider } from "../components/divider.component";
-import { Headings, Title } from "../components/headings.component";
-import { RootLayout } from "../components/layouts.component";
-import { LoginForm } from "../components/auth.component";
+import { LoginForm } from "$components/auth.component";
+import { Divider } from "$components/divider.component";
+import { Headings, Title } from "$components/headings.component";
+import { RootLayout } from "$components/layouts.component";
 
 export function LoginPage() {
   return (

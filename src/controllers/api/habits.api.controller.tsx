@@ -1,3 +1,6 @@
+import { Hono } from "hono";
+import { z } from "zod";
+import { zValidator } from "@hono/zod-validator";
 import {
   HabitHistoryItem,
   HabitItem,
@@ -10,10 +13,7 @@ import {
 } from "$components/notifications.component";
 import { executeHandlerForSessionUser } from "$lib";
 import { habitService } from "$services/habits.service";
-import { zValidator } from "@hono/zod-validator";
-import { Hono } from "hono";
 import { AppVariables } from "src";
-import { z } from "zod";
 
 export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
   .put(
@@ -45,8 +45,7 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
             type: "success",
             message: "Habit updated successfully",
           }}
-        />,
-        200
+        />
       );
     }
   )
@@ -72,7 +71,7 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
       if (habitsCount && habitsCount.length === 0) {
         res.headers.append("HX-Trigger", "load-habits");
       }
-      return html(<NotificationItem {...notification} />, 204);
+      return html(<NotificationItem {...notification} />);
     }
   )
   .get(
@@ -112,7 +111,7 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
         date: z.string(),
       })
     ),
-    async ({ html, text, req }) => {
+    async ({ html, req }) => {
       const { date, id } = req.valid("param");
       const existingHabit = await habitService.findById(id);
       if (!existingHabit) {
@@ -155,7 +154,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
         color: z.string(),
       })
     ),
-    async ({ status, req, text, html, get, res }) => {
+    async ({ req, text, html, get, res }) => {
       const sessionUser = get("sessionUser");
       if (!sessionUser) {
         throw new Error("Error session user");
@@ -167,9 +166,11 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
         userId: sessionUser.id,
       });
       if (body.color === "#000000") {
+        res.headers.append("HX-Reswap", "innerHTML");
         return text("Please select another color than black", 400);
       }
       if (!createdHabit) {
+        res.headers.append("HX-Reswap", "innerHTML");
         return text("An error occured", 500);
       }
       if (habitsCount && habitsCount.length === 0) {

@@ -1,5 +1,5 @@
 import { migrate } from "drizzle-orm/libsql/migrator";
-import { db } from ".";
+import { db } from "$db";
 
 (async () => {
   try {
