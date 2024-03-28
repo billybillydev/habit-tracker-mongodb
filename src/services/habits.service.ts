@@ -102,6 +102,18 @@ export const habitService = {
     });
     return result;
   },
+  async findByTitle(searchValue: string, userId: string): Promise<Habit[]> {
+    const result = await db.query.habitSchema.findMany({
+      where: (fields, { eq, and, like }) => and(like(fields.title, `%${searchValue}%`), eq(fields.userId, userId)),
+      with: {
+        histories: true,
+      },
+      orderBy(fields, { desc }) {
+        return desc(fields.created_at);
+      },
+    });
+    return result;
+  },
   async create(body: Omit<InsertHabit, "id">): Promise<Habit | undefined> {
     const [{id}] = await db
       .insert(habitSchema)

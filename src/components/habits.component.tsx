@@ -1,9 +1,13 @@
-import { SecondaryButton, PrimaryButton, InfoButton, DangerButton } from "$components/buttons.component";
+import {
+  SecondaryButton,
+  PrimaryButton,
+  InfoButton,
+  DangerButton,
+} from "$components/buttons.component";
 import { FormField } from "$components/fields.component";
 import { Notification } from "$components/notifications.component";
 import { Habit } from "$db/schema";
 import { generateDatesByNumberOfDays } from "$lib";
-
 
 export type HabitsProps = { habits: Habit[] };
 
@@ -54,12 +58,18 @@ export function CreateHabitForm() {
   );
 }
 
+export type EditHabitProps = {
+  id: Habit["id"];
+  title: Habit["title"];
+  description: Habit["description"];
+  modalRef: string;
+};
 export function EditHabitForm({
   title,
   description,
   id,
   modalRef,
-}: Omit<Habit, "color"> & { modalRef: string }) {
+}: EditHabitProps) {
   const editHabitErrorMessageId = "edit-habit-error";
   const targetItem = "habit-item-" + id;
   return (
@@ -138,12 +148,8 @@ export function HabitComponent({ item }: { item: Habit }) {
       // hx-target={`#${habitHistories}`}
       // hx-swap="outerHTML"
     >
-      <h2 class={"text-xl font-medium"}>
-        {item.title}
-      </h2>
-      <p class={"text-md text-slate-400"}>
-        {item.description}
-      </p>
+      <h2 class={"text-xl font-medium"}>{item.title}</h2>
+      <p class={"text-md text-slate-400"}>{item.description}</p>
       {/* <div id={habitHistories} /> */}
       <HabitHistoryList habit={item} />
       <div class={"flex gap-x-4"}>
@@ -272,11 +278,7 @@ export function HabitHistoryItem({
   );
 }
 
-export function HabitHistoryList({
-  habit,
-}: {
-  habit: Habit;
-}) {
+export function HabitHistoryList({ habit }: { habit: Habit }) {
   const dates = generateDatesByNumberOfDays(90);
   return (
     <ul class={"flex gap-1 flex-wrap"}>
@@ -286,9 +288,11 @@ export function HabitHistoryList({
           <HabitHistoryItem
             habit={habit}
             date={formatedDate}
-            completed={!!habit.histories?.some(
-              (history) => history.date === formatedDate
-            )}
+            completed={
+              !!habit.histories?.some(
+                (history) => history.date === formatedDate
+              )
+            }
           />
         );
       })}

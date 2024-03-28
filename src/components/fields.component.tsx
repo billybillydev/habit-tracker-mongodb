@@ -1,8 +1,5 @@
-export type FormFieldProps = {
+export type FormFieldProps = JSX.HtmlInputTag & {
   fieldName: string;
-  type?: JSX.HtmlInputTag["type"];
-  value?: string;
-  class?: JSX.HtmlInputTag["class"];
 };
 
 export function FormField({
@@ -10,6 +7,7 @@ export function FormField({
   type,
   value,
   class: className,
+  ...rest
 }: FormFieldProps) {
   const classes = [
     "flex gap-x-3 items-center justify-center p-2",
@@ -27,6 +25,7 @@ export function FormField({
         type={type || "text"}
         value={value || ""}
         required="true"
+        {...rest}
       />
     </div>
   );

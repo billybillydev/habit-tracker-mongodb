@@ -1,4 +1,4 @@
-import { EditHabitForm } from "$components/habits.component";
+import { EditHabitForm, EditHabitProps } from "$components/habits.component";
 import { Habit } from "$db/schema";
 
 export type ModalProps = { children: JSX.Element | JSX.Element[]; ref: string };
@@ -49,12 +49,12 @@ export function Modal({ children, ref }: ModalProps) {
   );
 }
 
-export function EditHabitModal({ habit }: { habit: Habit }) {
+export function EditHabitModal(props: Omit<EditHabitProps, "modalRef"> ) {
   const modalRef = "edit-habit-modal";
-  const props = { ...habit, modalRef };
+  const formProps = {...props, modalRef}
   return (
     <Modal ref={modalRef}>
-      <EditHabitForm {...props} />
+      <EditHabitForm {...formProps} />
     </Modal>
   );
 }

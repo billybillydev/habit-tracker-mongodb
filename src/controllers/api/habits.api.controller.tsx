@@ -87,7 +87,6 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
       z.object({
         title: z.string(),
         description: z.string(),
-        color: z.string(),
       })
     ),
     ({ html, req, get }) => {
@@ -97,9 +96,8 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
       }
       const { id } = req.valid("param");
       const query = req.valid("query");
-      return html(
-        <EditHabitModal habit={{ ...query, id, userId: sessionUser.id }} />
-      );
+      const props = { ...query, id };
+      return html(<EditHabitModal {...props} />);
     }
   )
   .post(
@@ -187,6 +185,23 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
         />,
         201
       );
+    }
+  )
+  .get(
+    "/search",
+    zValidator("query", z.object({ value: z.string() })),
+    async ({ req, get, html }) => {
+      const { value } = req.valid("query");
+      const sessionUser = get("sessionUser");
+      console.log({ value });
+      const habits = await executeHandlerForSessionUser(
+        (user) =>
+          value
+            ? habitService.findByTitle(value, user.id)
+            : habitService.findManyByUserId(user.id),
+        sessionUser
+      );
+      return html(<Habits habits={habits} />);
     }
   )
   .post("/samples", async ({ get, html }) => {
