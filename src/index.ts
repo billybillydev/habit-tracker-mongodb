@@ -1,8 +1,13 @@
 import { auth, lucia, SessionUser } from "$auth";
-import { router } from "$controllers/*";
+import { apiController } from "$controllers/api/*";
+import { habitsController } from "$controllers/habits.controller";
+import { homeController } from "$controllers/home.controller";
+import { loginController } from "$controllers/login.controller";
+import { registerController } from "$controllers/register.controller";
 import { db } from "$db";
+import { htmxMiddleware } from "$middlewares/htmx.middleware";
+import { sessionMiddleware } from "$middlewares/session.middleware";
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 import { serveStatic } from "hono/bun";
 import { config } from "./config";
 
@@ -26,18 +31,22 @@ const app = new Hono<{ Variables: AppVariables }>();
 
 app
   .use("/public/*", serveStatic({ root: "./" }))
-  .use(cors({
-    origin(origin) {
-      return origin;
-    }
-  }))
   .use(async ({ set }, next) => {
     set("auth", auth);
     set("db", db);
     set("lucia", lucia);
     await next();
   })
-  .route("/", router);
+  .use(htmxMiddleware, sessionMiddleware)
+  .route("/", homeController)
+  .route("/login", loginController)
+  .route("/register", registerController)
+  .route("/habits", habitsController)
+  .route("/api", apiController)
+  .onError((err, c) => {
+    console.error(`${err}`);
+    return c.text("An Error occured", 500);
+  });
 
 export default {
   port: config.port,

@@ -31,9 +31,13 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
       maxAge: 60 * 10,
       path: "/",
     });
-    console.log("in api/login/google")
-    ctx.res.headers.append("Access-Control-Allow-Origin", "*");
-    return ctx.redirect(url.href);
+    console.log("in api/login/google");
+    return ctx.header("HX-Redirect", url.href);
+    // return new Response(null, {
+    //     headers: {
+    //         "HX-Redirect": url.href
+    //     }
+    // });
   })
   .get(
     "/callback",
@@ -85,12 +89,13 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
 
       const session = await lucia.createSession(user.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-      setCookie(
-        ctx,
-        "lucia_session",
-        sessionCookie.value
-        // sessionCookie.attributes
-      );
+      setCookie(ctx, "lucia_session", sessionCookie.value, {
+        domain: sessionCookie.attributes.domain,
+        expires: sessionCookie.attributes.expires,
+        httpOnly: sessionCookie.attributes.httpOnly,
+        path: sessionCookie.attributes.path,
+        maxAge: sessionCookie.attributes.maxAge,
+      });
       return ctx.redirect("/habits");
     }
   );
@@ -101,7 +106,7 @@ const loginApiController = new Hono<{ Variables: AppVariables }>()
     zValidator(
       "form",
       z.object({
-        email: z.string(),
+        email: z.string().email(),
         password: z.string(),
       })
     ),
@@ -114,7 +119,7 @@ const loginApiController = new Hono<{ Variables: AppVariables }>()
       }
       // Ensure that user is BasicUser
       if (!user.password) {
-        return ctx.text("Internal Server Error", 500);
+        throw new Error("Internal Server Error");
       }
       const validPassword = await new Argon2id().verify(
         user.password,
@@ -125,13 +130,15 @@ const loginApiController = new Hono<{ Variables: AppVariables }>()
       }
       const session = await lucia.createSession(user.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-      setCookie(
-        ctx,
-        "lucia_session",
-        sessionCookie.value
-        // sessionCookie.attributes
-      );
-      return ctx.res.headers.append("HX-Redirect", "/");
+      setCookie(ctx, "lucia_session", sessionCookie.value, {
+        domain: sessionCookie.attributes.domain,
+        expires: sessionCookie.attributes.expires,
+        httpOnly: sessionCookie.attributes.httpOnly,
+        path: sessionCookie.attributes.path,
+        maxAge: sessionCookie.attributes.maxAge,
+      });
+      ctx.header("HX-Redirect", "/habits");
+      return ctx.text("");
     }
   )
   .route("/google", googleAuthApiController);
@@ -141,7 +148,7 @@ const registerApiController = new Hono<{ Variables: AppVariables }>().post(
   zValidator(
     "form",
     z.object({
-      email: z.string(),
+      email: z.string().email(),
       password: z.string(),
       name: z.string(),
     })
@@ -165,12 +172,13 @@ const registerApiController = new Hono<{ Variables: AppVariables }>().post(
     });
     const session = await lucia.createSession(newUser.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
-    setCookie(
-      ctx,
-      "lucia_session",
-      sessionCookie.value
-      // sessionCookie.attributes
-    );
+    setCookie(ctx, "lucia_session", sessionCookie.value, {
+      domain: sessionCookie.attributes.domain,
+      expires: sessionCookie.attributes.expires,
+      httpOnly: sessionCookie.attributes.httpOnly,
+      path: sessionCookie.attributes.path,
+      maxAge: sessionCookie.attributes.maxAge,
+    });
     return ctx.html(
       <HomePage isHTMX={Boolean(ctx.req.header("hx-request"))} isAuth />,
       200,
@@ -183,7 +191,7 @@ const logoutApiController = new Hono<{ Variables: AppVariables }>().post(
   "/",
   async (ctx) => {
     const lucia = ctx.get("lucia");
-      const lucia_session = getCookie(ctx, "lucia_session");
+    const lucia_session = getCookie(ctx, "lucia_session");
 
     if (!lucia_session) {
       throw new Error("Lucia session doesn't exist");

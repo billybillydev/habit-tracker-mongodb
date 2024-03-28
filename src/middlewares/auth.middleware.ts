@@ -15,10 +15,9 @@ export const isAuthMiddleware: MiddlewareHandler<{
 
 export const checkAuthAndRedirectMiddleware: MiddlewareHandler<{
   Variables: AppVariables;
-}> = async ({ var: { isAuth }, redirect, status}, next) => {
+}> = async ({ var: { isAuth }, redirect}, next) => {
   if (!isAuth) {
-    status(401);
-    redirect("/login");
+    return redirect("/login");
   }
   await next();
 };

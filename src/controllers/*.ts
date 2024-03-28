@@ -13,4 +13,8 @@ export const router = new Hono()
   .route("/login", loginController)
   .route("/register", registerController)
   .route("/habits", habitsController)
-  .route("/api", apiController);
+  .route("/api", apiController)
+  .onError((err, c) => {
+    console.error(`${err}`);
+    return c.text("An Error occured", 500);
+  });

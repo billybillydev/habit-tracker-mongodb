@@ -17,17 +17,12 @@ export const notificationApiController = new Hono()
     zValidator(
       "json",
       z.object({
-        type: z.union([
-          z.literal("success"),
-          z.literal("error"),
-          z.literal("info"),
-          z.literal("warning"),
-        ]),
+        type: z.enum(["success", "error", "info", "warning"]),
         message: z.string(),
       })
     ),
     ({ html, req }) => {
-        const body = req.valid("json");
+      const body = req.valid("json");
       return html(<NotificationItem {...body} />);
     }
   );
