@@ -1,10 +1,10 @@
 import classNames from "classnames";
 import { NotificationList } from "./notifications.component";
 
-export type HTMLProps = {
+export type HTMLProps = HTMLElement & {
   title: string;
   children: JSX.Element | JSX.Element[];
-  class?: HTMLBodyElement["className"];
+  class?: string;
   isHTMX?: boolean;
 };
 
@@ -37,7 +37,7 @@ export function BaseHtml({
           src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
         ></script>
       </head>
-      <body class={classes} hx-ext="response-targets" x-data>
+      <body class={classes} hx-ext="response-targets" x-data hx-boost="true">
         <div
           hx-get="/api/notifications/register/success"
           hx-trigger="registerSuccessNotification from:body"

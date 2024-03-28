@@ -1,4 +1,3 @@
-import { Html } from "@elysiajs/html";
 import { Divider } from "../components/divider.component";
 import { Headings, Title } from "../components/headings.component";
 import { RootLayout } from "../components/layouts.component";
