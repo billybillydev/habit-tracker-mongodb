@@ -20,19 +20,24 @@ export function HabitsPage({
             </a>
           </Headings>
           <hr />
-          <div class={"mx-auto flex gap-x-3 items-center"}>
+          <div class={"mx-auto flex gap-x-3 items-center w-full px-2 md:px-6 xl:px-12"}>
             {/* <SecondaryButton hx-post="/api/auth/logout" text="Log out" /> */}
-            <label for="value">Search</label>
-            <input
-              class={"grow rounded-md bg-neutral-800"}
-              type="search"
-              name="value"
-              id="value"
-              hx-get="/api/habits/search"
-              hx-trigger="keyup changed delay:1000ms"
-              hx-target="#habit-list"
-              hx-swap="outerHTML"
-            />
+            <div class="grow flex gap-x-3 items-center">
+              <label for="value">Search</label>
+              <input
+                class={"grow rounded-md bg-neutral-800"}
+                type="search"
+                name="value"
+                id="value"
+                hx-get="/api/habits/search"
+                hx-trigger="keyup changed delay:1000ms"
+                hx-target="#habit-list"
+                hx-swap="outerHTML"
+              />
+            </div>
+            <div class="px-3">
+              <a href="/settings">Settings</a>
+            </div>
           </div>
         </div>
         <CreateHabitComponent />
