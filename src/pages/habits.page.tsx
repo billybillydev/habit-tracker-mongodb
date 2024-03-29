@@ -29,7 +29,7 @@ export function HabitsPage({
               name="value"
               id="value"
               hx-get="/api/habits/search"
-              hx-trigger="load, keyup changed delay:1000ms"
+              hx-trigger="keyup changed delay:1000ms"
               hx-target="#habit-list"
               hx-swap="outerHTML"
             />

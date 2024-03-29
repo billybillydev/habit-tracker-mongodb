@@ -190,10 +190,9 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
   .get(
     "/search",
     zValidator("query", z.object({ value: z.string() })),
-    async ({ req, get, html }) => {
+    async ({ req, get, html, header }) => {
       const { value } = req.valid("query");
       const sessionUser = get("sessionUser");
-      console.log({ value });
       const habits = await executeHandlerForSessionUser(
         (user) =>
           value
@@ -201,6 +200,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
             : habitService.findManyByUserId(user.id),
         sessionUser
       );
+      header("HX-Push-Url", "/habits?search=" + value);
       return html(<Habits habits={habits} />);
     }
   )
