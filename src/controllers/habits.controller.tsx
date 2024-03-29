@@ -25,6 +25,6 @@ export const habitsController = new Hono<{ Variables: AppVariables }>()
             : habitService.findManyByUserId(user.id),
         sessionUser
       );
-      return html(<HabitsPage habits={habits} />);
+      return html(<HabitsPage habits={habits} searchValue={search} />);
     }
   );

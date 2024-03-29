@@ -9,7 +9,8 @@ import { Habit } from "$db/schema";
 export function HabitsPage({
   habits,
   isHTMX,
-}: PageContext<{ habits: Habit[] }>) {
+  searchValue,
+}: PageContext<{ habits: Habit[]; searchValue?: string }>) {
   return (
     <RootLayout title="Habit Tracker" isHTMX={isHTMX}>
       <section class="h-full flex flex-col gap-y-8">
@@ -20,7 +21,11 @@ export function HabitsPage({
             </a>
           </Headings>
           <hr />
-          <div class={"mx-auto flex gap-x-3 items-center w-full px-2 md:px-6 xl:px-12"}>
+          <div
+            class={
+              "mx-auto flex gap-x-3 items-center w-full px-2 md:px-6 xl:px-12"
+            }
+          >
             {/* <SecondaryButton hx-post="/api/auth/logout" text="Log out" /> */}
             <div class="grow flex gap-x-3 items-center">
               <label for="value">Search</label>
@@ -33,6 +38,7 @@ export function HabitsPage({
                 hx-trigger="keyup changed delay:1000ms"
                 hx-target="#habit-list"
                 hx-swap="outerHTML"
+                value={searchValue}
               />
             </div>
             <div class="px-3">
