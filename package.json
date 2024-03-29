@@ -2,7 +2,7 @@
   "name": "habit-tracker",
   "version": "1.0.50",
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "dev": "bun run --hot src/index.tsx",
     "db:generate": "bunx drizzle-kit generate:sqlite",
     "db:studio": "bunx drizzle-kit studio",
     "db:migrate": "bun run src/db/migrate.ts"

@@ -10,6 +10,7 @@ import { sessionMiddleware } from "$middlewares/session.middleware";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { config } from "$config";
+import { NotFoundPage } from "$pages/404.page";
 
 type Cookie = Partial<{
   google_code_verifier: string;
@@ -43,9 +44,15 @@ app
   .route("/register", registerController)
   .route("/habits", habitsController)
   .route("/api", apiController)
+  .get("/404", ({ html }) => {
+    return html(<NotFoundPage />);
+  })
   .onError((err, c) => {
     console.error(`${err}`);
     return c.text("An Error occured", 500);
+  })
+  .notFound(({ redirect }) => {
+    return redirect("/404");
   });
 
 export default {
