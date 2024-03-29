@@ -1,5 +1,8 @@
 import { executeHandlerForSessionUser } from "$lib";
-import { checkAuthAndRedirectMiddleware, isAuthMiddleware } from "$middlewares/auth.middleware";
+import {
+  checkAuthAndRedirectMiddleware,
+  isAuthMiddleware,
+} from "$middlewares/auth.middleware";
 import { HabitsPage } from "$pages/habits.page";
 import { habitService } from "$services/habits.service";
 import { zValidator } from "@hono/zod-validator";
@@ -18,13 +21,11 @@ export const habitsController = new Hono<{ Variables: AppVariables }>()
     async ({ html, get, req }) => {
       const search = req.valid("query")?.search;
       const sessionUser = get("sessionUser");
-      const habits = await executeHandlerForSessionUser(
-        (user) =>
-          search
-            ? habitService.findByTitle(search, user.id)
-            : habitService.findManyByUserId(user.id),
+      const [habits, counts] = await executeHandlerForSessionUser(
+        async (user) =>
+          Promise.all([search ? habitService.findByTitle(search, user.id) : habitService.findManyByUserId(user.id), habitService.count(user.id)]),
         sessionUser
       );
-      return html(<HabitsPage habits={habits} searchValue={search} />);
+      return html(<HabitsPage habits={habits} searchValue={search} count={counts} limit={4} offset={0} />);
     }
   );

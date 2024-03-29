@@ -68,11 +68,11 @@ export const habitService = {
   },
   async count(userId: string) {
     const result = await db
-      .select({ count: sql`count(*)`.mapWith(Number) })
+      .select({ count: sql<number>`count(*)` })
       .from(habitSchema)
       .where(eq(habitSchema.userId, userId)).get();
 
-    return result?.count;
+    return result?.count ?? 0;
   },
   async seed(userId: string) {
     await db.insert(habitSchema).values(getSampleHabits(userId));
@@ -90,9 +90,11 @@ export const habitService = {
     });
     return result;
   },
-  async findManyByUserId(userId: string): Promise<Habit[]> {
+  async findManyByUserId(userId: string, limit: number = 4, offset: number = 0): Promise<Habit[]> {
     const result = await db.query.habitSchema.findMany({
       where: (fields, { eq }) => eq(fields.userId, userId),
+      limit,
+      offset,
       with: {
         histories: true,
       },

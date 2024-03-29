@@ -299,3 +299,34 @@ export function HabitHistoryList({ habit }: { habit: Habit }) {
     </ul>
   );
 }
+
+export function HabitsMoreButton({
+  habitLength,
+  offset,
+  limit,
+  count,
+}: {
+  habitLength: number;
+  limit: number;
+  offset: number;
+  count: number;
+}) {
+  const newOffset = offset + limit;
+  return (
+    <div class="mx-auto pb-4" id="more-habits">
+      <p>
+        Viewing {habitLength} of {count}
+      </p>
+      {habitLength < count && (
+        <SecondaryButton
+          text="See more"
+          hx-get="/api/habits/more"
+          hx-vals={JSON.stringify({ limit, offset: newOffset })}
+          hx-target="#habit-list"
+          hx-swap="beforeend show:bottom"
+          hx-select-oob="#more-habits"
+        />
+      )}
+    </div>
+  );
+}

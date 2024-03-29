@@ -5,6 +5,7 @@ import {
   HabitHistoryItem,
   HabitItem,
   Habits,
+  HabitsMoreButton,
 } from "$components/habits.component";
 import { EditHabitModal } from "$components/modals.component";
 import {
@@ -184,6 +185,34 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
           }}
         />,
         201
+      );
+    }
+  )
+  .get(
+    "/more",
+    zValidator(
+      "query",
+      z.object({ offset: z.coerce.number(), limit: z.coerce.number() })
+    ),
+    async ({ html, get, req }) => {
+      const { offset, limit } = req.valid("query");
+      console.log("In api controller : ", { offset, limit });
+      const sessionUser = get("sessionUser");
+      const [habits, count] = await executeHandlerForSessionUser(
+        async (user) =>
+          Promise.all([
+            habitService.findManyByUserId(user.id, limit, offset),
+            habitService.count(user.id),
+          ]),
+        sessionUser
+      );
+      return html(
+        <>
+          {habits.map((habit) => (
+            <HabitItem item={habit} />
+          ))}
+          <HabitsMoreButton habitLength={habits.length + offset} count={count} offset={offset} limit={limit} />
+        </>
       );
     }
   )

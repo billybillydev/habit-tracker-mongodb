@@ -1,7 +1,5 @@
 import { PageContext } from "$components/base-html.component";
-import { SecondaryButton } from "$components/buttons.component";
-import { FormField } from "$components/fields.component";
-import { CreateHabitComponent, Habits } from "$components/habits.component";
+import { CreateHabitComponent, Habits, HabitsMoreButton } from "$components/habits.component";
 import { Headings, Title } from "$components/headings.component";
 import { RootLayout } from "$components/layouts.component";
 import { Habit } from "$db/schema";
@@ -10,7 +8,16 @@ export function HabitsPage({
   habits,
   isHTMX,
   searchValue,
-}: PageContext<{ habits: Habit[]; searchValue?: string }>) {
+  count,
+  offset,
+  limit,
+}: PageContext<{
+  habits: Habit[];
+  searchValue?: string;
+  count: number;
+  offset: number;
+  limit: number;
+}>) {
   return (
     <RootLayout title="Habit Tracker" isHTMX={isHTMX}>
       <section class="h-full flex flex-col gap-y-8">
@@ -48,6 +55,7 @@ export function HabitsPage({
         </div>
         <CreateHabitComponent />
         <Habits habits={habits} />
+        <HabitsMoreButton habitLength={habits.length} count={count} offset={offset} limit={limit} />
       </section>
     </RootLayout>
   );
