@@ -70,9 +70,9 @@ export const habitService = {
     const result = await db
       .select({ count: sql`count(*)`.mapWith(Number) })
       .from(habitSchema)
-      .where(eq(habitSchema.userId, userId));
+      .where(eq(habitSchema.userId, userId)).get();
 
-    return result;
+    return result?.count;
   },
   async seed(userId: string) {
     await db.insert(habitSchema).values(getSampleHabits(userId));

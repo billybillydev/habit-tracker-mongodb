@@ -68,7 +68,7 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
         type: "success",
         message: "Habit deleted successfully",
       };
-      if (habitsCount && habitsCount.length === 0) {
+      if (habitsCount === 0) {
         res.headers.append("HX-Trigger", "load-habits");
       }
       return html(<NotificationItem {...notification} />);
@@ -171,7 +171,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
         res.headers.append("HX-Reswap", "innerHTML");
         return text("An error occured", 500);
       }
-      if (habitsCount && habitsCount.length === 0) {
+      if (habitsCount === 0) {
         res.headers.append("HX-Reswap", "outerHTML");
         return html(<Habits habits={[createdHabit]} />, 201);
       }
