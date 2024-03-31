@@ -6,9 +6,10 @@ export type HTMLProps = HTMLElement & {
   children: JSX.Element | JSX.Element[];
   class?: string;
   isHTMX?: boolean;
+  currentURL?: string;
 };
 
-export type PageContext<T> = T & Pick<HTMLProps, "isHTMX">;
+export type PageContext<T> = T & Pick<HTMLProps, "isHTMX" | "currentURL">;
 
 export function BaseHtml({
   title,
@@ -33,7 +34,7 @@ export function BaseHtml({
         <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
         <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
         <script
-          defer
+          defer="true"
           src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
         ></script>
       </head>

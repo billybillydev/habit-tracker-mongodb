@@ -192,18 +192,24 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
     "/more",
     zValidator(
       "query",
-      z.object({ offset: z.coerce.number(), limit: z.coerce.number() })
+      z.object({ offset: z.coerce.number(), limit: z.coerce.number(), search: z.optional(z.string()) })
     ),
     async ({ html, get, req }) => {
-      const { offset, limit } = req.valid("query");
-      console.log("In api controller : ", { offset, limit });
+      const { offset, limit, search } = req.valid("query");
       const sessionUser = get("sessionUser");
       const [habits, count] = await executeHandlerForSessionUser(
         async (user) =>
-          Promise.all([
-            habitService.findManyByUserId(user.id, limit, offset),
-            habitService.count(user.id),
-          ]),
+          Promise.all(
+            search
+              ? [
+                  habitService.findByTitle(search, user.id, limit, offset),
+                  habitService.countTitle(search, user.id),
+                ]
+              : [
+                  habitService.findManyByUserId(user.id, limit, offset),
+                  habitService.count(user.id),
+                ]
+          ),
         sessionUser
       );
       return html(
@@ -211,26 +217,53 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
           {habits.map((habit) => (
             <HabitItem item={habit} />
           ))}
-          <HabitsMoreButton habitLength={habits.length + offset} count={count} offset={offset} limit={limit} />
+          <HabitsMoreButton
+            habitLength={habits.length + offset}
+            count={count}
+            offset={offset}
+            limit={limit}
+            search={search}
+          />
         </>
       );
     }
   )
   .get(
     "/search",
-    zValidator("query", z.object({ value: z.string() })),
+    zValidator(
+      "query",
+      z.object({
+        value: z.string(),
+        limit: z.optional(z.coerce.number()),
+        offset: z.optional(z.coerce.number()),
+      })
+    ),
     async ({ req, get, html, header }) => {
-      const { value } = req.valid("query");
+      const { value, offset = 0, limit = 4 } = req.valid("query");
       const sessionUser = get("sessionUser");
-      const habits = await executeHandlerForSessionUser(
+      const [habits, count] = await executeHandlerForSessionUser(
         (user) =>
-          value
-            ? habitService.findByTitle(value, user.id)
-            : habitService.findManyByUserId(user.id),
+          Promise.all([
+            value
+              ? habitService.findByTitle(value, user.id, limit, offset)
+              : habitService.findManyByUserId(user.id),
+            habitService.countTitle(value, user.id),
+          ]),
         sessionUser
       );
       header("HX-Push-Url", "/habits?search=" + value);
-      return html(<Habits habits={habits} />);
+      return html(
+        <>
+          <Habits habits={habits} />
+          <HabitsMoreButton
+            habitLength={habits.length + offset}
+            count={count}
+            offset={offset}
+            limit={limit}
+            search={value}
+          />
+        </>
+      );
     }
   )
   .post("/samples", async ({ get, html }) => {

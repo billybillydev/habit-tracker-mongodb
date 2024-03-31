@@ -23,7 +23,17 @@ export const habitsController = new Hono<{ Variables: AppVariables }>()
       const sessionUser = get("sessionUser");
       const [habits, counts] = await executeHandlerForSessionUser(
         async (user) =>
-          Promise.all([search ? habitService.findByTitle(search, user.id) : habitService.findManyByUserId(user.id), habitService.count(user.id)]),
+          Promise.all(
+            search
+              ? [
+                  habitService.findByTitle(search, user.id),
+                  habitService.countTitle(search, user.id),
+                ]
+              : [
+                  habitService.findManyByUserId(user.id),
+                  habitService.count(user.id),
+                ]
+          ),
         sessionUser
       );
       return html(<HabitsPage habits={habits} searchValue={search} count={counts} limit={4} offset={0} />);

@@ -11,6 +11,7 @@ export function HabitsPage({
   count,
   offset,
   limit,
+  currentURL,
 }: PageContext<{
   habits: Habit[];
   searchValue?: string;
@@ -45,6 +46,8 @@ export function HabitsPage({
                 hx-trigger="keyup changed delay:1000ms"
                 hx-target="#habit-list"
                 hx-swap="outerHTML"
+                hx-vals={JSON.stringify({ offset, limit })}
+                hx-select-oob="#more-habits"
                 value={searchValue}
               />
             </div>
@@ -55,7 +58,13 @@ export function HabitsPage({
         </div>
         <CreateHabitComponent />
         <Habits habits={habits} />
-        <HabitsMoreButton habitLength={habits.length} count={count} offset={offset} limit={limit} />
+        <HabitsMoreButton
+          habitLength={habits.length}
+          count={count}
+          offset={offset}
+          limit={limit}
+          search={searchValue}
+        />
       </section>
     </RootLayout>
   );

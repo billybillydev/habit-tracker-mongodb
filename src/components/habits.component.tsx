@@ -305,11 +305,13 @@ export function HabitsMoreButton({
   offset,
   limit,
   count,
+  search = "",
 }: {
   habitLength: number;
   limit: number;
   offset: number;
   count: number;
+  search?: string;
 }) {
   const newOffset = offset + limit;
   return (
@@ -321,7 +323,7 @@ export function HabitsMoreButton({
         <SecondaryButton
           text="See more"
           hx-get="/api/habits/more"
-          hx-vals={JSON.stringify({ limit, offset: newOffset })}
+          hx-vals={JSON.stringify({ limit, offset: newOffset, search })}
           hx-target="#habit-list"
           hx-swap="beforeend show:bottom"
           hx-select-oob="#more-habits"

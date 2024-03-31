@@ -1,6 +1,11 @@
-import { eq, sql, and } from "drizzle-orm";
+import { eq, sql, and, like } from "drizzle-orm";
 import { db } from "$db";
-import { habitHistorySchema, habitSchema, Habit, InsertHabit } from "$db/schema";
+import {
+  habitHistorySchema,
+  habitSchema,
+  Habit,
+  InsertHabit,
+} from "$db/schema";
 import { generateDatesWithCompletion } from "$lib";
 
 export const habitService = {
@@ -70,7 +75,8 @@ export const habitService = {
     const result = await db
       .select({ count: sql<number>`count(*)` })
       .from(habitSchema)
-      .where(eq(habitSchema.userId, userId)).get();
+      .where(eq(habitSchema.userId, userId))
+      .get();
 
     return result?.count ?? 0;
   },
@@ -90,7 +96,11 @@ export const habitService = {
     });
     return result;
   },
-  async findManyByUserId(userId: string, limit: number = 4, offset: number = 0): Promise<Habit[]> {
+  async findManyByUserId(
+    userId: string,
+    limit: number = 4,
+    offset: number = 0
+  ): Promise<Habit[]> {
     const result = await db.query.habitSchema.findMany({
       where: (fields, { eq }) => eq(fields.userId, userId),
       limit,
@@ -104,20 +114,42 @@ export const habitService = {
     });
     return result;
   },
-  async findByTitle(searchValue: string, userId: string): Promise<Habit[]> {
+  async findByTitle(
+    searchValue: string,
+    userId: string,
+    limit: number = 4,
+    offset: number = 0
+  ): Promise<Habit[]> {
     const result = await db.query.habitSchema.findMany({
-      where: (fields, { eq, and, like }) => and(like(fields.title, `%${searchValue}%`), eq(fields.userId, userId)),
+      where: (fields, { eq, and, like }) =>
+        and(like(fields.title, `%${searchValue}%`), eq(fields.userId, userId)),
       with: {
         histories: true,
       },
+      limit,
+      offset,
       orderBy(fields, { desc }) {
         return desc(fields.created_at);
       },
     });
     return result;
   },
+  async countTitle(searchValue: string, userId: string) {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(habitSchema)
+      .where(
+        and(
+          like(habitSchema.title, `%${searchValue}%`),
+          eq(habitSchema.userId, userId)
+        )
+      )
+      .get();
+
+    return result?.count ?? 0;
+  },
   async create(body: Omit<InsertHabit, "id">): Promise<Habit | undefined> {
-    const [{id}] = await db
+    const [{ id }] = await db
       .insert(habitSchema)
       .values(body)
       .returning({ id: habitSchema.id });
