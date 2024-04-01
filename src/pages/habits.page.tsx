@@ -1,5 +1,9 @@
 import { PageContext } from "$components/base-html.component";
-import { CreateHabitComponent, Habits, HabitsMoreButton } from "$components/habits.component";
+import {
+  CreateHabitComponent,
+  Habits,
+  HabitsMoreButton,
+} from "$components/habits.component";
 import { Headings, Title } from "$components/headings.component";
 import { RootLayout } from "$components/layouts.component";
 import { Habit } from "$db/schema";
@@ -11,7 +15,7 @@ export function HabitsPage({
   count,
   offset,
   limit,
-  currentURL,
+  sessionUser,
 }: PageContext<{
   habits: Habit[];
   searchValue?: string;
@@ -29,12 +33,14 @@ export function HabitsPage({
             </a>
           </Headings>
           <hr />
+          {sessionUser ? (
+            <h2 class="text-center text-xl">Hello {sessionUser.name}</h2>
+          ) : null}
           <div
             class={
               "mx-auto flex gap-x-3 items-center w-full px-2 md:px-6 xl:px-12"
             }
           >
-            {/* <SecondaryButton hx-post="/api/auth/logout" text="Log out" /> */}
             <div class="grow flex gap-x-3 items-center">
               <label for="value">Search</label>
               <input
@@ -52,7 +58,7 @@ export function HabitsPage({
               />
             </div>
             <div class="px-3">
-              <a href="/settings">Settings</a>
+              <a title="for not found purpose" href="/settings">Settings</a>
             </div>
           </div>
         </div>

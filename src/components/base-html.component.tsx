@@ -1,5 +1,6 @@
-import classNames from "classnames";
+import { SessionUser } from "$auth";
 import { NotificationList } from "$components/notifications.component";
+import classNames from "classnames";
 
 export type HTMLProps = HTMLElement & {
   title: string;
@@ -7,9 +8,10 @@ export type HTMLProps = HTMLElement & {
   class?: string;
   isHTMX?: boolean;
   currentURL?: string;
+  sessionUser?: SessionUser;
 };
 
-export type PageContext<T> = T & Pick<HTMLProps, "isHTMX" | "currentURL">;
+export type PageContext<T> = T & Omit<HTMLProps, "title" | "children">;
 
 export function BaseHtml({
   title,

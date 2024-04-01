@@ -251,7 +251,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
           ]),
         sessionUser
       );
-      header("HX-Push-Url", "/habits?search=" + value);
+      header("HX-Push-Url", value ? "/habits?search=" + value : "/habits");
       return html(
         <>
           <Habits habits={habits} />

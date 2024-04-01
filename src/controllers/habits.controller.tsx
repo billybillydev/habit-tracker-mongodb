@@ -36,6 +36,6 @@ export const habitsController = new Hono<{ Variables: AppVariables }>()
           ),
         sessionUser
       );
-      return html(<HabitsPage habits={habits} searchValue={search} count={counts} limit={4} offset={0} />);
+      return html(<HabitsPage sessionUser={sessionUser} habits={habits} searchValue={search} count={counts} limit={4} offset={0} />);
     }
   );
