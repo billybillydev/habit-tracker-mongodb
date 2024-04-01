@@ -314,21 +314,25 @@ export function HabitsMoreButton({
   search?: string;
 }) {
   const newOffset = offset + limit;
+  const hxQuery: { offset: number; search?: string } = { offset: newOffset };
+  if (search) {
+    hxQuery.search = search;
+  }
   return (
-    <div class="mx-auto pb-4" id="more-habits">
+    <form
+      name="more-habits"
+      class="mx-auto pb-4"
+      id="more-habits"
+      hx-get="/api/habits/more"
+      hx-vals={JSON.stringify(hxQuery)}
+      hx-target="#habit-list"
+      hx-swap="beforeend show:bottom"
+      hx-select-oob="#more-habits"
+    >
       <p>
         Viewing {habitLength} of {count}
       </p>
-      {habitLength < count && (
-        <SecondaryButton
-          text="See more"
-          hx-get="/api/habits/more"
-          hx-vals={JSON.stringify({ limit, offset: newOffset, search })}
-          hx-target="#habit-list"
-          hx-swap="beforeend show:bottom"
-          hx-select-oob="#more-habits"
-        />
-      )}
-    </div>
+      {habitLength < count && <SecondaryButton text="See more" />}
+    </form>
   );
 }

@@ -6,6 +6,7 @@ import {
 } from "$components/habits.component";
 import { Headings, Title } from "$components/headings.component";
 import { RootLayout } from "$components/layouts.component";
+import { LimitPaginationRadio } from "$components/pagination.component";
 import { Habit } from "$db/schema";
 
 export function HabitsPage({
@@ -58,11 +59,14 @@ export function HabitsPage({
               />
             </div>
             <div class="px-3">
-              <a title="for not found purpose" href="/settings">Settings</a>
+              <a title="for not found purpose" href="/settings">
+                Settings
+              </a>
             </div>
           </div>
         </div>
         <CreateHabitComponent />
+        <LimitPaginationRadio limit={limit} />
         <Habits habits={habits} />
         <HabitsMoreButton
           habitLength={habits.length}

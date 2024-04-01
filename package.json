@@ -23,11 +23,12 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "typed-html": "^3.0.1",
-    "typed-htmx": "^0.2.1",
-    "drizzle-kit": "^0.19.13",
+    "@types/alpinejs": "^3.13.10",
+    "@types/bun": "latest",
     "better-sqlite3": "^8.6.0",
-    "@types/bun": "latest"
+    "drizzle-kit": "^0.19.13",
+    "typed-html": "^3.0.1",
+    "typed-htmx": "^0.2.1"
   },
   "module": "src/index.js"
 }
