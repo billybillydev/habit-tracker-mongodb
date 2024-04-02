@@ -37,6 +37,10 @@ export function BaseHtml({
         <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
         <script
           defer="true"
+          src="https://unpkg.com/alpinejs-manage@latest/dist/manage.min.js"
+        ></script>
+        <script
+          defer="true"
           src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
         ></script>
       </head>

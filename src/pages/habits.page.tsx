@@ -26,7 +26,9 @@ export function HabitsPage({
 }>) {
   return (
     <RootLayout title="Habit Tracker" isHTMX={isHTMX}>
-      <section class="h-full flex flex-col gap-y-8">
+      <section
+        class="h-full flex flex-col gap-y-8"
+      >
         <div class={"flex flex-col gap-y-4"}>
           <Headings>
             <a href="/">

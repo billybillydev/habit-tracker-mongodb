@@ -8,6 +8,7 @@ import { FormField } from "$components/fields.component";
 import { Notification } from "$components/notifications.component";
 import { Habit } from "$db/schema";
 import { generateDatesByNumberOfDays } from "$lib";
+import classNames from "classnames";
 
 export type HabitsProps = { habits: Habit[] };
 
@@ -136,49 +137,52 @@ export function CreateHabitComponent() {
   );
 }
 
-export function HabitComponent({ item }: { item: Habit }) {
-  const habitHistories = "habit-histories-" + item.id;
+export function HabitComponent({
+  item,
+  class: className,
+}: {
+  item: Habit;
+  class?: string;
+}) {
   return (
     <section
-      class={
-        "rounded-md border border-slate-300 p-5 flex flex-col gap-y-4 max-w-xl"
-      }
-      // hx-get={`/api/habits/${item.id}/histories`}
-      // hx-trigger="load"
-      // hx-target={`#${habitHistories}`}
-      // hx-swap="outerHTML"
+      class={classNames(
+        "h-full rounded-md border border-slate-300 p-5 flex flex-col gap-y-4 max-w-xl &>p:text-slate-400",
+        className
+      )}
+      x-bind:class={`{ "bg-red-700": itemIdsToDelete.has(${item.id}) }`}
     >
       <h2 class={"text-xl font-medium"}>{item.title}</h2>
-      <p class={"text-md text-slate-400"}>{item.description}</p>
-      {/* <div id={habitHistories} /> */}
+      <p class={"text-md"}>{item.description}</p>
       <HabitHistoryList habit={item} />
-      <div class={"flex gap-x-4"}>
-        <InfoButton
-          class={
-            "px-3 py-2 rounded border text-sky-600 hover:bg-sky-600 hover:text-white"
-          }
-          text="Edit"
-          variant="solid"
-          hx-get={`/api/habits/${item.id}/edit`}
-          hx-target="body"
-          hx-swap="afterbegin"
-          hx-vals={JSON.stringify({
-            title: item.title,
-            description: item.description,
-            color: item.color,
-          })}
-        />
-        <DangerButton
-          class={
-            "px-3 py-2 rounded border text-red-600 hover:bg-red-600 hover:text-white"
-          }
-          text="Delete"
-          variant="solid"
-          hx-delete={`/api/habits/${item.id}`}
-          hx-swap="afterbegin"
-          hx-target="#notification-list"
-          hx-confirm="Are you sure ?"
-          x-init={`
+      <template x-if={`!itemIdsToDelete.has(${item.id})`}>
+        <div class={"flex gap-x-4"}>
+          <InfoButton
+            class={
+              "px-3 py-2 rounded border text-sky-600 hover:bg-sky-600 hover:text-white"
+            }
+            text="Edit"
+            variant="solid"
+            hx-get={`/api/habits/${item.id}/edit`}
+            hx-target="body"
+            hx-swap="afterbegin"
+            hx-vals={JSON.stringify({
+              title: item.title,
+              description: item.description,
+              color: item.color,
+            })}
+          />
+          <DangerButton
+            class={
+              "px-3 py-2 rounded border text-red-600 hover:bg-red-600 hover:text-white"
+            }
+            text="Delete"
+            variant="solid"
+            hx-delete={`/api/habits/${item.id}`}
+            hx-swap="afterbegin"
+            hx-target="#notification-list"
+            hx-confirm="Are you sure ?"
+            x-init={`
             $el.addEventListener("htmx:afterRequest", ({ detail }) => {
               console.log(detail.xhr.status);
               if (detail.xhr.status === 200) {
@@ -186,8 +190,9 @@ export function HabitComponent({ item }: { item: Habit }) {
               }
             })
           `}
-        />
-      </div>
+          />
+        </div>
+      </template>
     </section>
   );
 }
@@ -195,18 +200,22 @@ export function HabitComponent({ item }: { item: Habit }) {
 export function HabitItem({
   item,
   triggerNotification,
+  class: className,
 }: {
   item: Habit;
   triggerNotification?: Notification;
+  class?: string;
 }) {
   return (
     <li
-      id={`habit-item-${item.id}`}
+      id={String(item.id)}
+      x-bind:title={"title"}
       x-data={`
         {
           triggerNotification: ${
             triggerNotification ? JSON.stringify(triggerNotification) : null
           },
+          title: "double click on this block to switch on deletion mode",
           init() {
             if (this.triggerNotification) {
               htmx.ajax('POST', '/api/notifications', { target: '#notification-list', swap: 'afterbegin', values: this.triggerNotification });
@@ -214,8 +223,22 @@ export function HabitItem({
           }
         }
       `}
+      x-on:dblclick={`
+        if (itemIdsToDelete.has(${item.id})) {
+          title = "double click on this block to switch on deletion mode";
+          itemIdsToDelete.delete(${item.id});
+        } else {
+          title = "double click on this block to switch on normal mode";
+          itemIdsToDelete.add(${item.id});
+        }
+        if (document.querySelector("#bulk") && itemIdsToDelete.size === 1) {
+          document.querySelector("#bulk").remove();
+        } else if (!document.querySelector("#bulk")) {
+          htmx.ajax('GET', '/api/habits/bulk', { target: '#habit-list', swap: 'beforebegin' })
+        }
+      `}
     >
-      <HabitComponent item={item} />
+      <HabitComponent item={item} class={className} />
     </li>
   );
 }
@@ -232,6 +255,19 @@ export function Habits({ habits }: HabitsProps) {
       hx-trigger="load-habits from:body"
       hx-target="this"
       hx-swap="outerHTML"
+      x-data={`{
+        itemIdsToDelete: new Set([])
+      }`}
+      x-init={`
+        window.addEventListener("select-all", ({ detail }) => {
+          items = document.querySelectorAll("#habit-list>li");
+          if (detail?.selectedAll) {
+            itemIdsToDelete = new Set(Array.from(items).map(item => Number(item.id)));
+          } else {
+            itemIdsToDelete.clear();
+          }
+        });
+      `}
     >
       {habits?.length ? (
         habits.map((habit) => <HabitItem item={habit} />)
@@ -328,11 +364,65 @@ export function HabitsMoreButton({
       hx-target="#habit-list"
       hx-swap="beforeend show:bottom"
       hx-select-oob="#more-habits"
+      x-data={`{ disableButton: false }`}
+      x-init={`
+        window.addEventListener("bulk-mode", ({ detail }) => {
+          disableButton = detail?.nbItemsToDelete > 0;
+        })
+      `}
     >
       <p>
         Viewing {habitLength} of {count}
       </p>
-      {habitLength < count && <SecondaryButton text="See more" />}
+      {habitLength < count && (
+        <SecondaryButton x-bind:disabled={`disableButton`} text="See more" />
+      )}
     </form>
+  );
+}
+
+export function HabitsBulkDeletion() {
+  return (
+    <div
+      x-data={`{ nbItemsToDelete: 0 }`}
+      id="bulk"
+      class="w-full flex items-center justify-center gap-x-12"
+      x-init={`
+        $watch("nbItemsToDelete", async (value) => {
+          if (value === 0) {
+            document.querySelector("#bulk").remove();
+            $manage("#habit-list").itemIdsToDelete.clear();
+          }
+        })
+      `}
+      x-effect={`
+        nbItemsToDelete = $manage("#habit-list").itemIdsToDelete.size;
+        $dispatch("bulk-mode", { nbItemsToDelete })
+      `}
+    >
+      <PrimaryButton
+        x-data={`{ text: "Select All" }`}
+        x-text="text"
+        x-on:click={`
+          items = document.querySelectorAll("#habit-list>li");
+          if (nbItemsToDelete === items.length) {
+            text = "Select All";
+            nbItemsToDelete = 0;
+            $dispatch("select-all", { selectedAll: false });
+          } else {
+            text = "Deselect All";
+            nbItemsToDelete = items.length;
+            $dispatch("select-all", { selectedAll: true });
+          }
+        `}
+      />
+      <DangerButton variant="solid" class="flex items-center gap-x-2">
+        <span>Delete</span>
+        <span
+          class="px-3 py-1 rounded-full border border-current"
+          x-text="nbItemsToDelete"
+        />
+      </DangerButton>
+    </div>
   );
 }

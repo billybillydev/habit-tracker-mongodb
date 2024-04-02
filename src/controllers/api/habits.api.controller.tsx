@@ -1,20 +1,24 @@
-import { Hono } from "hono";
-import { z } from "zod";
-import { zValidator } from "@hono/zod-validator";
 import {
+  HabitComponent,
   HabitHistoryItem,
   HabitItem,
   Habits,
-  HabitsMoreButton,
+  HabitsBulkDeletion,
+  HabitsMoreButton
 } from "$components/habits.component";
 import { EditHabitModal } from "$components/modals.component";
 import {
   Notification,
   NotificationItem,
 } from "$components/notifications.component";
+import { LimitPaginationRadio } from "$components/pagination.component";
+import { Habit } from "$db/schema";
 import { executeHandlerForSessionUser } from "$lib";
 import { habitService } from "$services/habits.service";
+import { zValidator } from "@hono/zod-validator";
+import { Hono } from "hono";
 import { AppVariables } from "src";
+import { z } from "zod";
 
 export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
   .put(
@@ -192,7 +196,11 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
     "/more",
     zValidator(
       "query",
-      z.object({ offset: z.coerce.number(), limit: z.coerce.number(), search: z.optional(z.string()) })
+      z.object({
+        offset: z.coerce.number(),
+        limit: z.coerce.number(),
+        search: z.optional(z.string()),
+      })
     ),
     async ({ html, get, req }) => {
       const { offset, limit, search } = req.valid("query");
@@ -264,6 +272,18 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
           />
         </>
       );
+    }
+  )
+  .get(
+    "/bulk",
+    ({ html }) => {
+      return html(<HabitsBulkDeletion />);
+    }
+  )
+  .get(
+    "/reset-bulk",
+    ({ html }) => {
+      return html(<LimitPaginationRadio limit={4} />);
     }
   )
   .post("/samples", async ({ get, html }) => {
