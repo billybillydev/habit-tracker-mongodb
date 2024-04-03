@@ -6,6 +6,7 @@ import {
 } from "$components/buttons.component";
 import { FormField } from "$components/fields.component";
 import { Notification } from "$components/notifications.component";
+import { LimitPaginationRadio } from "$components/pagination.component";
 import { Habit } from "$db/schema";
 import { generateDatesByNumberOfDays } from "$lib";
 import classNames from "classnames";
@@ -72,7 +73,7 @@ export function EditHabitForm({
   modalRef,
 }: EditHabitProps) {
   const editHabitErrorMessageId = "edit-habit-error";
-  const targetItem = "habit-item-" + id;
+  const targetItem = id;
   return (
     <form
       hx-put={"/api/habits/" + id}
@@ -186,7 +187,7 @@ export function HabitComponent({
             $el.addEventListener("htmx:afterRequest", ({ detail }) => {
               console.log(detail.xhr.status);
               if (detail.xhr.status === 200) {
-                document.querySelector("#habit-item-${item.id}").remove();
+                document.querySelector("#${item.id}").remove();
               }
             })
           `}
@@ -245,16 +246,12 @@ export function HabitItem({
 
 export function Habits({ habits }: HabitsProps) {
   const className = habits?.length
-    ? "grid grid-cols-1 md:grid-cols-2 gap-5 p-4 mx-auto border"
+    ? "grid grid-cols-1 md:grid-cols-2 gap-5 p-4 border"
     : "";
   return (
     <ul
       id={"habit-list"}
       class={className}
-      hx-get="/api/habits"
-      hx-trigger="load-habits from:body"
-      hx-target="this"
-      hx-swap="outerHTML"
       x-data={`{
         itemIdsToDelete: new Set([])
       }`}
@@ -269,25 +266,9 @@ export function Habits({ habits }: HabitsProps) {
         });
       `}
     >
-      {habits?.length ? (
-        habits.map((habit) => <HabitItem item={habit} />)
-      ) : (
-        <li class={"p-2 w-full md:w-2/3 xl:w-1/2 mx-auto"}>
-          <p class={"py-4 text-xl"}>
-            You don't have any habits yet. Click to "Add Habit" button above to
-            create one
-          </p>
-          <p class={"text-lg"}>
-            <span>Do you want some samples ?</span>
-            <SecondaryButton
-              hx-post="/api/habits/samples"
-              hx-target="#habit-list"
-              hx-swap="outerHTML"
-              text="Click here"
-            />
-          </p>
-        </li>
-      )}
+      {habits.map((habit) => (
+        <HabitItem item={habit} />
+      ))}
     </ul>
   );
 }
@@ -416,13 +397,108 @@ export function HabitsBulkDeletion() {
           }
         `}
       />
-      <DangerButton variant="solid" class="flex items-center gap-x-2">
+      <DangerButton
+        variant="solid"
+        class="flex items-center gap-x-2"
+        x-init={`
+          items = Array.from($manage("#habit-list").itemIdsToDelete);
+          
+        `}
+        x-on:click={`
+          items = Array.from($manage("#habit-list").itemIdsToDelete);
+          if (window.confirm("Are you sure to delete these " + nbItemsToDelete + " items ?")) {
+            htmx.ajax("DELETE", "/api/habits/bulk?" + items.map((item) => "items=" + item).join("&"), { target: "#notification-list", swap: "afterbegin" }).then(() => {
+              items.forEach((item) => document.getElementById(item).remove())
+            });
+          }
+        `}
+      >
         <span>Delete</span>
         <span
           class="px-3 py-1 rounded-full border border-current"
           x-text="nbItemsToDelete"
         />
       </DangerButton>
+    </div>
+  );
+}
+
+export function HabitContainer({
+  count,
+  limit,
+  offset,
+  searchValue,
+  habits,
+}: {
+  limit: number;
+  count: number;
+  offset: number;
+  searchValue?: string;
+  habits: Habit[];
+}) {
+  return (
+    <div
+      id="habit-container"
+      class="flex flex-col items-center justify-center gap-y-3"
+      hx-get="/api/habits"
+      hx-trigger="load-habits from:body"
+      hx-target="this"
+      hx-swap="outerHTML"
+    >
+      <div
+        class={"mx-auto flex gap-x-3 items-center w-full px-2 md:px-6 xl:px-12"}
+      >
+        <div class="grow flex gap-x-3 items-center">
+          <label for="value">Search</label>
+          <input
+            class={"grow rounded-md bg-neutral-800"}
+            type="search"
+            name="value"
+            id="value"
+            hx-get="/api/habits/search"
+            hx-trigger="keyup changed delay:1000ms"
+            hx-target="#habit-list"
+            hx-swap="outerHTML"
+            hx-vals={JSON.stringify({ offset, limit })}
+            hx-select-oob="#more-habits"
+            value={searchValue}
+          />
+        </div>
+        <div class="px-3">
+          <a title="for not found purpose" href="/settings">
+            Settings
+          </a>
+        </div>
+      </div>
+      <LimitPaginationRadio limit={limit} />
+      <Habits habits={habits} />
+      <HabitsMoreButton
+        habitLength={habits.length}
+        count={count}
+        offset={offset}
+        limit={limit}
+        search={searchValue}
+      />
+    </div>
+  );
+}
+
+export function NoHabits() {
+  return (
+    <div id="no-habit" class={"p-2 w-full md:w-2/3 xl:w-1/2 mx-auto"}>
+      <p class={"py-4 text-xl"}>
+        You don't have any habits yet. Click to "Add Habit" button above to
+        create one
+      </p>
+      <p class={"text-lg"}>
+        <span>Do you want some samples ?</span>
+        <SecondaryButton
+          hx-post="/api/habits/samples"
+          hx-target="#no-habit"
+          hx-swap="outerHTML"
+          text="Click here"
+        />
+      </p>
     </div>
   );
 }

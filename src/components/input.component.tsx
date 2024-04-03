@@ -8,7 +8,7 @@ export function RadioInput({
   ...restProps
 }: RadioProps<{ limit?: number; }>) {
   return (
-    <div class="">
+    <div class="flex">
       <input type="radio" id={id} class="hidden peer" {...restProps} />
       <label for={id} class={className}>
         {text ?? children}

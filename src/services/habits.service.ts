@@ -1,4 +1,4 @@
-import { eq, sql, and, like } from "drizzle-orm";
+import { eq, sql, and, like, inArray } from "drizzle-orm";
 import { db } from "$db";
 import {
   habitHistorySchema,
@@ -168,6 +168,14 @@ export const habitService = {
     const result = await db
       .delete(habitSchema)
       .where(eq(habitSchema.id, id))
+      .returning()
+      .get();
+    return result;
+  },
+  async deleteBulkIds(ids: number[]) {
+    const result = await db
+      .delete(habitSchema)
+      .where(inArray(habitSchema.id, ids))
       .returning()
       .get();
     return result;
