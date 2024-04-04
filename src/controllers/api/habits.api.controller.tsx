@@ -1,5 +1,4 @@
 import {
-  HabitComponent,
   HabitContainer,
   HabitHistoryItem,
   HabitItem,
@@ -14,7 +13,6 @@ import {
   NotificationItem,
 } from "$components/notifications.component";
 import { LimitPaginationRadio } from "$components/pagination.component";
-import { Habit } from "$db/schema";
 import { executeHandlerForSessionUser } from "$lib";
 import { habitService } from "$services/habits.service";
 import { zValidator } from "@hono/zod-validator";
@@ -190,7 +188,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       }
       if (habitsCount === 0) {
         res.headers.append("HX-Reswap", "outerHTML");
-        return html(<Habits habits={[createdHabit]} />, 201);
+        return html(Habits({ habits: [createdHabit] }), 201);
       }
       return html(
         <HabitItem
@@ -274,7 +272,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       header("HX-Push-Url", value ? "/habits?search=" + value : "/habits");
       return html(
         <>
-          <Habits habits={habits} />
+          {Habits({ habits })}
           <HabitsMoreButton
             habitLength={habits.length + offset}
             count={count}
@@ -292,24 +290,27 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
   .get("/reset-bulk", ({ html }) => {
     return html(<LimitPaginationRadio limit={4} />);
   })
-  .post(
-    "/samples",
-    async ({ get, html }) => {
-      const limit = 4, offset = 0;
-      const sessionUser = get("sessionUser");
-      const habits = await executeHandlerForSessionUser(
-        (user) => habitService.history.seed(user.id),
-        sessionUser
-      );
-      const count = await executeHandlerForSessionUser(
-        (user) => habitService.count(user.id),
-        sessionUser
-      );
-      return html(
-        <HabitContainer count={count} habits={habits.slice(0, limit)} limit={4} offset={0} />
-      );
-    }
-  )
+  .post("/samples", async ({ get, html }) => {
+    const limit = 4,
+      offset = 0;
+    const sessionUser = get("sessionUser");
+    const habits = await executeHandlerForSessionUser(
+      (user) => habitService.history.seed(user.id),
+      sessionUser
+    );
+    const count = await executeHandlerForSessionUser(
+      (user) => habitService.count(user.id),
+      sessionUser
+    );
+    return html(
+      <HabitContainer
+        count={count}
+        habits={habits.slice(0, limit)}
+        limit={4}
+        offset={0}
+      />
+    );
+  })
   .delete(
     "/bulk",
     zValidator("query", z.object({ items: z.array(z.coerce.number()) })),

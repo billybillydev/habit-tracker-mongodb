@@ -31,10 +31,10 @@ export function BaseHtml({
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{title}</title>
+        <link rel="stylesheet" href="public/styles/index.css" />
         <script src="https://unpkg.com/htmx.org@1.9.5"></script>
         <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
         <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
-        <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
         <script
           defer="true"
           src="https://unpkg.com/alpinejs-manage@latest/dist/manage.min.js"

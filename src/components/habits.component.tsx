@@ -290,8 +290,9 @@ export function HabitHistoryItem({
 }) {
   return (
     <li
-      class={`w-5 h-5 rounded cursor-pointer ${
-        completed ? `bg-[${habit.color}]` : "bg-black"
+      class={`w-5 h-5 rounded cursor-pointer`}
+      style={`background-color: ${
+        completed ? habit.color : "black"
       }`}
       title={date}
       hx-post={`/api/habits/${habit.id}/toggle/${date}`}
