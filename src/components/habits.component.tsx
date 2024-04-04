@@ -10,6 +10,7 @@ import { LimitPaginationRadio } from "$components/pagination.component";
 import { Habit } from "$db/schema";
 import { generateDatesByNumberOfDays } from "$lib";
 import classNames from "classnames";
+import { html } from "hono/html";
 
 export type HabitsProps = { habits: Habit[] };
 
@@ -202,10 +203,12 @@ export function HabitItem({
   item,
   triggerNotification,
   class: className,
+  ...restProps
 }: {
   item: Habit;
   triggerNotification?: Notification;
   class?: string;
+  "@click"?: string;
 }) {
   return (
     <li
@@ -224,20 +227,25 @@ export function HabitItem({
           }
         }
       `}
-      x-on:dblclick={`
-        if (itemIdsToDelete.has(${item.id})) {
-          title = "double click on this block to switch on deletion mode";
-          itemIdsToDelete.delete(${item.id});
-        } else {
-          title = "double click on this block to switch on normal mode";
-          itemIdsToDelete.add(${item.id});
+      {...restProps}
+      {
+        ...{
+          "@dblclick": `
+            if (itemIdsToDelete.has(${item.id})) {
+              title = "double click on this block to switch on deletion mode";
+              itemIdsToDelete.delete(${item.id});
+            } else {
+              title = "double click on this block to switch on normal mode";
+              itemIdsToDelete.add(${item.id});
+            }
+            if (document.querySelector("#bulk") && itemIdsToDelete.size === 1) {
+              document.querySelector("#bulk").remove();
+            } else if (!document.querySelector("#bulk")) {
+              htmx.ajax('GET', '/api/habits/bulk', { target: '#habit-list', swap: 'beforebegin' })
+            }
+          `
         }
-        if (document.querySelector("#bulk") && itemIdsToDelete.size === 1) {
-          document.querySelector("#bulk").remove();
-        } else if (!document.querySelector("#bulk")) {
-          htmx.ajax('GET', '/api/habits/bulk', { target: '#habit-list', swap: 'beforebegin' })
-        }
-      `}
+      }
     >
       <HabitComponent item={item} class={className} />
     </li>
@@ -248,29 +256,27 @@ export function Habits({ habits }: HabitsProps) {
   const className = habits?.length
     ? "grid grid-cols-1 md:grid-cols-2 gap-5 p-4 border"
     : "";
-  return (
+  return html`
     <ul
-      id={"habit-list"}
-      class={className}
-      x-data={`{
+      id="habit-list"
+      class="${className}"
+      x-data="{
         itemIdsToDelete: new Set([])
-      }`}
-      x-init={`
-        window.addEventListener("select-all", ({ detail }) => {
-          items = document.querySelectorAll("#habit-list>li");
-          if (detail?.selectedAll) {
-            itemIdsToDelete = new Set(Array.from(items).map(item => Number(item.id)));
-          } else {
-            itemIdsToDelete.clear();
-          }
-        });
-      `}
+      }"
+      @select-all.window="
+        items = document.querySelectorAll('#habit-list>li');
+        if ($event.detail?.selectedAll) {
+          itemIdsToDelete = new Set(Array.from(items).map(item => Number(item.id)));
+        } else {
+          itemIdsToDelete.clear();
+        }
+      "
     >
-      {habits.map((habit) => (
-        <HabitItem item={habit} />
+      ${habits.map((habit) => (
+        <HabitItem {...{ "@click": "console.log('test')" }} item={habit} />
       ))}
     </ul>
-  );
+  `;
 }
 
 export function HabitHistoryItem({
@@ -471,7 +477,7 @@ export function HabitContainer({
         </div>
       </div>
       <LimitPaginationRadio limit={limit} />
-      <Habits habits={habits} />
+      {Habits({habits})}
       <HabitsMoreButton
         habitLength={habits.length}
         count={count}
