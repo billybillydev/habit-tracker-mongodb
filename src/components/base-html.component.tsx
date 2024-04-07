@@ -2,9 +2,8 @@ import { SessionUser } from "$auth";
 import { NotificationList } from "$components/notifications.component";
 import classNames from "classnames";
 
-export type HTMLProps = HTMLElement & {
+export type HTMLProps = JSX.ElementChildrenAttribute & {
   title: string;
-  children: JSX.Element | JSX.Element[];
   class?: string;
   isHTMX?: boolean;
   currentURL?: string;
@@ -32,17 +31,14 @@ export function BaseHtml({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{title}</title>
         <link rel="stylesheet" href="public/styles/index.css" />
-        <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+        <script src="public/script/app.js" defer="true"></script>
+        <script
+          src="https://unpkg.com/htmx.org@1.9.11"
+          integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+          crossorigin="anonymous"
+        ></script>
         <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
-        <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
-        <script
-          defer="true"
-          src="https://unpkg.com/alpinejs-manage@latest/dist/manage.min.js"
-        ></script>
-        <script
-          defer="true"
-          src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-        ></script>
+        {/* <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script> */}
       </head>
       <body class={classes} hx-ext="response-targets" x-data hx-boost="true">
         <div

@@ -1,4 +1,4 @@
-import { RadioInput } from "$components/input.component";
+import { RadioInput } from "$components/inputs.component";
 
 export function LimitPaginationRadio({ limit }: { limit: number }) {
   const options = [4, 8, 12];

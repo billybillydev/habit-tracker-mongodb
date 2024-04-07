@@ -23,35 +23,7 @@ export function NotificationItem({ type, message, duration }: Notification) {
   }
   return (
     <li
-      x-data={`
-        {
-          duration: ${duration ?? 10000},
-          timeout: null,
-          resetTimeout() {
-            clearTimeout(this.timeout);
-            this.timeout = null;
-          },
-          close() {
-            this.resetTimeout();
-            $refs.notificationItem.remove();
-          },
-          closerClick: {
-              ["@click"]() {
-                this.close();
-              }
-          },
-          hover: {
-              ["@mouseenter"]() {
-                if (this.timeout) {
-                  this.resetTimeout();
-                }
-              }
-          },
-          init() {
-            this.timeout = setTimeout(() => this.close(), this.duration);
-          }
-        }
-    `}
+      x-data={`notification("${duration}")`}
       x-ref="notificationItem"
       x-bind="hover"
       class={[

@@ -74,11 +74,10 @@ export function EditHabitForm({
   modalRef,
 }: EditHabitProps) {
   const editHabitErrorMessageId = "edit-habit-error";
-  const targetItem = id;
   return (
     <form
       hx-put={"/api/habits/" + id}
-      hx-target={`#${targetItem}`}
+      hx-target={`#habit-${id}`}
       hx-swap="outerHTML"
       hx-target-4xx={`#${editHabitErrorMessageId}`}
       hx-target-5xx={`#${editHabitErrorMessageId}`}
@@ -188,7 +187,7 @@ export function HabitComponent({
             $el.addEventListener("htmx:afterRequest", ({ detail }) => {
               console.log(detail.xhr.status);
               if (detail.xhr.status === 200) {
-                document.querySelector("#${item.id}").remove();
+                document.querySelector("#habit-${item.id}").remove();
               }
             })
           `}
@@ -212,7 +211,7 @@ export function HabitItem({
 }) {
   return (
     <li
-      id={String(item.id)}
+      id={`habit-${item.id}`}
       x-bind:title={"title"}
       x-data={`
         {
@@ -228,9 +227,8 @@ export function HabitItem({
         }
       `}
       {...restProps}
-      {
-        ...{
-          "@dblclick": `
+      {...{
+        "@dblclick": `
             if (itemIdsToDelete.has(${item.id})) {
               title = "double click on this block to switch on deletion mode";
               itemIdsToDelete.delete(${item.id});
@@ -243,9 +241,8 @@ export function HabitItem({
             } else if (!document.querySelector("#bulk")) {
               htmx.ajax('GET', '/api/habits/bulk', { target: '#habit-list', swap: 'beforebegin' })
             }
-          `
-        }
-      }
+          `,
+      }}
     >
       <HabitComponent item={item} class={className} />
     </li>
@@ -266,11 +263,12 @@ export function Habits({ habits }: HabitsProps) {
       @select-all.window="
         items = document.querySelectorAll('#habit-list>li');
         if ($event.detail?.selectedAll) {
-          itemIdsToDelete = new Set(Array.from(items).map(item => Number(item.id)));
+          itemIdsToDelete = new Set(Array.from(items).map(item => Number(item.id.split("-")[1])));
         } else {
           itemIdsToDelete.clear();
         }
       "
+      x-effect="console.log(itemIdsToDelete.size)"
     >
       ${habits.map((habit) => (
         <HabitItem {...{ "@click": "console.log('test')" }} item={habit} />
@@ -414,9 +412,7 @@ export function HabitsBulkDeletion() {
         x-on:click={`
           items = Array.from($manage("#habit-list").itemIdsToDelete);
           if (window.confirm("Are you sure to delete these " + nbItemsToDelete + " items ?")) {
-            htmx.ajax("DELETE", "/api/habits/bulk?" + items.map((item) => "items=" + item).join("&"), { target: "#notification-list", swap: "afterbegin" }).then(() => {
-              items.forEach((item) => document.getElementById(item).remove())
-            });
+            htmx.ajax("DELETE", "/api/habits/bulk?" + items.map((item) => "items=" + item).join("&"), { target: "#notification-list", swap: "afterbegin" });
           }
         `}
       >

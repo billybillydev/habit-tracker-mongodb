@@ -7,33 +7,16 @@ export function Modal({ children, ref }: ModalProps) {
   return (
     <div
       class="fixed w-screen h-screen flex items-center justify-center p-2"
-      x-data={`
-        {
-          closeModal() {
-            $refs["${ref}"].remove();
-          },
-          removerEscape: {
-            ["@keyup.escape"]() {
-              this.closeModal();
-            }
-          },
-          removerClick: {
-            ["@click"]() {
-              this.closeModal();
-            }
-          }
-        }
-      `}
+      x-data={`modal("${ref}")`}
       x-ref={ref}
+      x-bind={`removerEscape`}
     >
       <div
         class={"w-full h-full bg-white/50 absolute"}
-        // x-bind={`removerClick`}
+        x-bind={`removerClick`}
       />
       <div
         class={"relative [&>*]:bg-zinc-900 text-white w-full md:w-3/4 xl:w-2/3"}
-        x-init="$el.focus();"
-        x-bind={`removerEscape`}
       >
         <button
           class={
@@ -49,9 +32,9 @@ export function Modal({ children, ref }: ModalProps) {
   );
 }
 
-export function EditHabitModal(props: Omit<EditHabitProps, "modalRef"> ) {
+export function EditHabitModal(props: Omit<EditHabitProps, "modalRef">) {
   const modalRef = "edit-habit-modal";
-  const formProps = {...props, modalRef}
+  const formProps = { ...props, modalRef };
   return (
     <Modal ref={modalRef}>
       <EditHabitForm {...formProps} />

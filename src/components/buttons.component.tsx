@@ -90,7 +90,6 @@ export function DangerButton({
           : "hover:text-red-600",
         className
       )}
-      variant={variant}
       {...restProps}
     />
   );
@@ -111,7 +110,6 @@ export function InfoButton({
           ? "text-sky-600 hover:bg-sky-600 hover:text-white"
           : "hover:text-sky-600"
       }
-      variant={variant}
       {...restProps}
     />
   );
