@@ -1,4 +1,5 @@
 /**
+ * Type for HabitListData function
  * @typedef {Object} ModalData
  * @property {Function} closeModal
  * @property {Object.<string, Function>} removerEscape

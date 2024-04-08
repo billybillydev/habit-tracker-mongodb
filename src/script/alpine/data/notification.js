@@ -40,5 +40,8 @@ export function notificationData(duration = 10000) {
     init() {
       this.timeout = setTimeout(() => this.close(), this.duration);
     },
+    destroy() {
+      clearTimeout(this.timeout);
+    }
   };
 }

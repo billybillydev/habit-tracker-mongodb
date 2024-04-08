@@ -184,7 +184,7 @@ export function HabitComponent({
             hx-target="#notification-list"
             hx-confirm="Are you sure ?"
             x-init={`
-            $el.addEventListener("htmx:afterRequest", ({ detail }) => {
+              $el.addEventListener("htmx:afterRequest", ({ detail }) => {
               console.log(detail.xhr.status);
               if (detail.xhr.status === 200) {
                 document.querySelector("#habit-${item.id}").remove();
@@ -207,74 +207,49 @@ export function HabitItem({
   item: Habit;
   triggerNotification?: Notification;
   class?: string;
-  "@click"?: string;
 }) {
   return (
     <li
       id={`habit-${item.id}`}
       x-bind:title={"title"}
       x-data={`
-        {
-          triggerNotification: ${
-            triggerNotification ? JSON.stringify(triggerNotification) : null
-          },
-          title: "double click on this block to switch on deletion mode",
-          init() {
-            if (this.triggerNotification) {
-              htmx.ajax('POST', '/api/notifications', { target: '#notification-list', swap: 'afterbegin', values: this.triggerNotification });
-            }
+        habitItem(
+          ${item.id},
+          "double click on this block to switch on deletion mode",
+          ${
+            triggerNotification
+              ? JSON.stringify(triggerNotification)
+              : undefined
           }
-        }
+        )
       `}
+      x-bind="doubleClick"
       {...restProps}
-      {...{
-        "@dblclick": `
-            if (itemIdsToDelete.has(${item.id})) {
-              title = "double click on this block to switch on deletion mode";
-              itemIdsToDelete.delete(${item.id});
-            } else {
-              title = "double click on this block to switch on normal mode";
-              itemIdsToDelete.add(${item.id});
-            }
-            if (document.querySelector("#bulk") && itemIdsToDelete.size === 1) {
-              document.querySelector("#bulk").remove();
-            } else if (!document.querySelector("#bulk")) {
-              htmx.ajax('GET', '/api/habits/bulk', { target: '#habit-list', swap: 'beforebegin' })
-            }
-          `,
-      }}
     >
       <HabitComponent item={item} class={className} />
     </li>
   );
 }
 
-export function Habits({ habits }: HabitsProps) {
+export function HabitList({ habits }: HabitsProps) {
   const className = habits?.length
     ? "grid grid-cols-1 md:grid-cols-2 gap-5 p-4 border"
     : "";
-  return html`
+  return (
     <ul
       id="habit-list"
-      class="${className}"
-      x-data="{
-        itemIdsToDelete: new Set([])
-      }"
-      @select-all.window="
-        items = document.querySelectorAll('#habit-list>li');
-        if ($event.detail?.selectedAll) {
-          itemIdsToDelete = new Set(Array.from(items).map(item => Number(item.id.split("-")[1])));
-        } else {
-          itemIdsToDelete.clear();
-        }
-      "
+      x-ref="habit-list"
+      x-model="itemIdsToDelete"
+      class={className}
+      x-data="habitList()"
+      x-bind="selectAllEvent"
       x-effect="console.log(itemIdsToDelete.size)"
     >
-      ${habits.map((habit) => (
-        <HabitItem {...{ "@click": "console.log('test')" }} item={habit} />
+      {habits.map((habit) => (
+        <HabitItem item={habit} />
       ))}
     </ul>
-  `;
+  );
 }
 
 export function HabitHistoryItem({
@@ -289,9 +264,7 @@ export function HabitHistoryItem({
   return (
     <li
       class={`w-5 h-5 rounded cursor-pointer`}
-      style={`background-color: ${
-        completed ? habit.color : "black"
-      }`}
+      style={`background-color: ${completed ? habit.color : "black"}`}
       title={date}
       hx-post={`/api/habits/${habit.id}/toggle/${date}`}
       hx-target="this"
@@ -351,11 +324,9 @@ export function HabitsMoreButton({
       hx-swap="beforeend show:bottom"
       hx-select-oob="#more-habits"
       x-data={`{ disableButton: false }`}
-      x-init={`
-        window.addEventListener("bulk-mode", ({ detail }) => {
-          disableButton = detail?.nbItemsToDelete > 0;
-        })
-      `}
+      {...{
+        "@bulk-mode": "disableButton = $event.detail?.nbItemsToDelete > 0;",
+      }}
     >
       <p>
         Viewing {habitLength} of {count}
@@ -407,7 +378,6 @@ export function HabitsBulkDeletion() {
         class="flex items-center gap-x-2"
         x-init={`
           items = Array.from($manage("#habit-list").itemIdsToDelete);
-          
         `}
         x-on:click={`
           items = Array.from($manage("#habit-list").itemIdsToDelete);
@@ -474,7 +444,7 @@ export function HabitContainer({
         </div>
       </div>
       <LimitPaginationRadio limit={limit} />
-      {Habits({habits})}
+      {HabitList({ habits })}
       <HabitsMoreButton
         habitLength={habits.length}
         count={count}

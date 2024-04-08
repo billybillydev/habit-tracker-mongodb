@@ -11,7 +11,7 @@ export function HomePage({
 }: PageContext<{ isAuth?: boolean }>) {
   const title = "Unleash Your Potential";
   const subTitle = "Build Lasting Habits That Stick";
-  
+
   return (
     <RootLayout
       title={[title, subTitle].join(" : ")}

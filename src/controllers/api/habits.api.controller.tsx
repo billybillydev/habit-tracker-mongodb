@@ -2,7 +2,7 @@ import {
   HabitContainer,
   HabitHistoryItem,
   HabitItem,
-  Habits,
+  HabitList,
   HabitsBulkDeletion,
   HabitsMoreButton,
   NoHabits,
@@ -188,7 +188,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       }
       if (habitsCount === 0) {
         res.headers.append("HX-Reswap", "outerHTML");
-        return html(Habits({ habits: [createdHabit] }), 201);
+        return html(HabitList({ habits: [createdHabit] }), 201);
       }
       return html(
         <HabitItem
@@ -272,7 +272,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       header("HX-Push-Url", value ? "/habits?search=" + value : "/habits");
       return html(
         <>
-          {Habits({ habits })}
+          {HabitList({ habits })}
           <HabitsMoreButton
             habitLength={habits.length + offset}
             count={count}
