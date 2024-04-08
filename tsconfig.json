@@ -28,9 +28,8 @@
       "$services/*": ["src/services/*"],
       "$pages": ["src/pages"],
       "$pages/*": ["src/pages/*"],
-      "$script": ["src/script"],
-      "$script/*": ["src/script/*"],
       "$lib": ["src/lib"]
     }
-  }
+  },
+  "exclude": ["public", "node_modules", "src/script"]
 }

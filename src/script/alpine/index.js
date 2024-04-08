@@ -1,6 +1,6 @@
-import { seoData, modalData, notificationData, habitItemData, habitListData } from "./data";
 import Alpine from "alpinejs";
 import manage from 'alpinejs-manage';
+import { habitItemData, habitListData, modalData, notificationData, seoData } from "./data";
 
 Alpine.data("seo", seoData);
 Alpine.data("modal", modalData);
