@@ -5,7 +5,7 @@ import {
   HabitList,
   HabitsBulkDeletion,
   HabitsMoreButton,
-  NoHabits,
+  NoHabits
 } from "$components/habits.component";
 import { EditHabitModal } from "$components/modals.component";
 import {
@@ -13,7 +13,8 @@ import {
   NotificationItem,
 } from "$components/notifications.component";
 import { LimitPaginationRadio } from "$components/pagination.component";
-import { executeHandlerForSessionUser } from "$lib";
+import { executeHandlerForSessionUser, getURL as getHxURL } from "$lib";
+import { getPaginationQueries, limitValues } from "$lib/pagination";
 import { habitService } from "$services/habits.service";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
@@ -61,21 +62,14 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
         id: z.coerce.number(),
       })
     ),
-    async ({ req, html, res, get }) => {
-      const sessionUser = get("sessionUser");
+    async ({ req, html, res }) => {
       const { id } = req.valid("param");
       await habitService.deleteById(id);
-      const habitsCount = await executeHandlerForSessionUser(
-        (user) => habitService.count(user.id),
-        sessionUser
-      );
       const notification: Notification = {
         type: "success",
         message: "Habit deleted successfully",
       };
-      if (habitsCount === 0) {
-        res.headers.append("HX-Trigger", "load-habits");
-      }
+      res.headers.append("HX-Trigger", "load-habits");
       return html(<NotificationItem {...notification} />);
     }
   )
@@ -140,21 +134,42 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
   );
 
 export const habitApiController = new Hono<{ Variables: AppVariables }>()
-  .get(async ({ html, get }) => {
+  .get(async ({ html, get, req }) => {
+    const url = getHxURL(req);
+    const { limit, offset, search } = getPaginationQueries(url);
     const sessionUser = get("sessionUser");
     const [habits, count] = await executeHandlerForSessionUser(
       (user) =>
-        Promise.all([
-          habitService.findManyByUserId(user.id),
-          habitService.count(user.id),
-        ]),
+        Promise.all(
+          search
+            ? [
+                habitService.findByTitle(
+                  search,
+                  user.id,
+                  !offset || offset === 0 ? limit : offset
+                ),
+                habitService.countTitle(search, user.id),
+              ]
+            : [
+                habitService.findManyByUserId(
+                  user.id,
+                  !offset || offset === 0 ? limit : offset
+                ),
+                habitService.count(user.id),
+              ]
+        ),
       sessionUser
     );
     return html(
-      habits.length ? (
-        <HabitContainer count={count} habits={habits} limit={4} offset={0} />
+      habits.length || search ? (
+        <HabitContainer
+          count={count}
+          habits={habits}
+          limit={limit}
+          searchValue={search}
+        />
       ) : (
-        <NoHabits count={count} limit={4} offset={0} />
+        <NoHabits />
       )
     );
   })
@@ -206,41 +221,46 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
     "/more",
     zValidator(
       "query",
-      z.object({
-        offset: z.coerce.number(),
-        limit: z.coerce.number(),
-        search: z.optional(z.string()),
-      })
+      z.object({ limit: z.coerce.number() })
     ),
-    async ({ html, get, req }) => {
-      const { offset, limit, search } = req.valid("query");
+    async ({ html, get, req, res }) => {
+      const url = getHxURL(req);
+      const { offset, search } = getPaginationQueries(url);
+      const { limit } = req.valid("query");
+      const newOffset = !offset || offset === 0 ? limitValues[0] : offset;
       const sessionUser = get("sessionUser");
       const [habits, count] = await executeHandlerForSessionUser(
         async (user) =>
           Promise.all(
             search
               ? [
-                  habitService.findByTitle(search, user.id, limit, offset),
+                  habitService.findByTitle(search, user.id, limit, newOffset),
                   habitService.countTitle(search, user.id),
                 ]
               : [
-                  habitService.findManyByUserId(user.id, limit, offset),
+                  habitService.findManyByUserId(user.id, limit, newOffset),
                   habitService.count(user.id),
                 ]
           ),
         sessionUser
       );
+      url.searchParams.set("limit", String(limit));
+      url.searchParams.set(
+        "offset",
+        String(newOffset + limit > count ? count : newOffset + limit)
+      );
+      if (search) {
+        url.searchParams.set("search", search);
+      }
+      res.headers.append("HX-Push-Url", url.href);
       return html(
         <>
           {habits.map((habit) => (
             <HabitItem item={habit} />
           ))}
           <HabitsMoreButton
-            habitLength={habits.length + offset}
+            habitLength={habits.length + newOffset}
             count={count}
-            offset={offset}
-            limit={limit}
-            search={search}
           />
         </>
       );
@@ -252,34 +272,41 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       "query",
       z.object({
         value: z.string(),
-        limit: z.optional(z.coerce.number()),
-        offset: z.optional(z.coerce.number()),
       })
     ),
     async ({ req, get, html, header }) => {
-      const { value, offset = 0, limit = 4 } = req.valid("query");
+      const url = getHxURL(req);
+      const { limit, offset } = getPaginationQueries(url);
+      const { value } = req.valid("query");
       const sessionUser = get("sessionUser");
       const [habits, count] = await executeHandlerForSessionUser(
         (user) =>
           Promise.all([
             value
-              ? habitService.findByTitle(value, user.id, limit, offset)
-              : habitService.findManyByUserId(user.id),
+              ? habitService.findByTitle(
+                  value,
+                  user.id,
+                  !offset || offset === 0 ? limit : offset
+                )
+              : habitService.findManyByUserId(
+                  user.id,
+                  !offset || offset === 0 ? limit : offset
+                ),
             habitService.countTitle(value, user.id),
           ]),
         sessionUser
       );
-      header("HX-Push-Url", value ? "/habits?search=" + value : "/habits");
+      if (value) {
+        url.searchParams.set("search", value);
+      } else {
+        url.searchParams.delete("search");
+      }
+      header("HX-Push-Url", url.href);
       return html(
         <>
-          {HabitList({ habits })}
-          <HabitsMoreButton
-            habitLength={habits.length + offset}
-            count={count}
-            offset={offset}
-            limit={limit}
-            search={value}
-          />
+          <LimitPaginationRadio limit={limit} count={count} />
+          <HabitList habits={habits} />
+          <HabitsMoreButton habitLength={habits.length} count={count} />
         </>
       );
     }
@@ -287,12 +314,8 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
   .get("/bulk", ({ html }) => {
     return html(<HabitsBulkDeletion />);
   })
-  .get("/reset-bulk", ({ html }) => {
-    return html(<LimitPaginationRadio limit={4} />);
-  })
   .post("/samples", async ({ get, html }) => {
-    const limit = 4,
-      offset = 0;
+    const limit = limitValues[0];
     const sessionUser = get("sessionUser");
     const habits = await executeHandlerForSessionUser(
       (user) => habitService.history.seed(user.id),
@@ -306,8 +329,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       <HabitContainer
         count={count}
         habits={habits.slice(0, limit)}
-        limit={4}
-        offset={0}
+        limit={limit}
       />
     );
   })
@@ -322,6 +344,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
         message: "Selected habits deleted successfully",
       };
       res.headers.append("HX-Trigger", "load-habits");
+      // res.headers.append("HX-Push-Url", "/habits");
       return html(<NotificationItem {...notification} />);
     }
   )

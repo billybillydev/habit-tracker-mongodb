@@ -13,14 +13,12 @@ export function HabitsPage({
   isHTMX,
   searchValue,
   count,
-  offset,
   limit,
   sessionUser,
 }: PageContext<{
   habits: Habit[];
   searchValue?: string;
   count: number;
-  offset: number;
   limit: number;
 }>) {
   return (
@@ -38,8 +36,8 @@ export function HabitsPage({
           ) : null}
         </div>
         <CreateHabitComponent />
-        {habits.length ? (
-          <HabitContainer count={count} habits={habits} limit={limit} offset={offset} searchValue={searchValue} />
+        {(habits.length || searchValue) ? (
+          <HabitContainer count={count} habits={habits} limit={limit} searchValue={searchValue} />
         ) : (
           <NoHabits />
         )}

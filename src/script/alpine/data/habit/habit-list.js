@@ -12,11 +12,6 @@
  */
 export function habitListData() {
   return {
-    init() {
-      this.$watch("itemIdsToDelete", (value) => {
-        console.log(value.size);
-      });
-    },
     itemIdsToDelete: new Set([]),
     /**
      * Handles custom event from $dispatch

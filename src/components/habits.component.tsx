@@ -10,7 +10,6 @@ import { LimitPaginationRadio } from "$components/pagination.component";
 import { Habit } from "$db/schema";
 import { generateDatesByNumberOfDays } from "$lib";
 import classNames from "classnames";
-import { html } from "hono/html";
 
 export type HabitsProps = { habits: Habit[] };
 
@@ -183,14 +182,6 @@ export function HabitComponent({
             hx-swap="afterbegin"
             hx-target="#notification-list"
             hx-confirm="Are you sure ?"
-            x-init={`
-              $el.addEventListener("htmx:afterRequest", ({ detail }) => {
-              console.log(detail.xhr.status);
-              if (detail.xhr.status === 200) {
-                document.querySelector("#habit-${item.id}").remove();
-              }
-            })
-          `}
           />
         </div>
       </template>
@@ -243,11 +234,14 @@ export function HabitList({ habits }: HabitsProps) {
       class={className}
       x-data="habitList()"
       x-bind="selectAllEvent"
-      x-effect="console.log(itemIdsToDelete.size)"
     >
-      {habits.map((habit) => (
-        <HabitItem item={habit} />
-      ))}
+      {habits.length ? (
+        habits.map((habit) => <HabitItem item={habit} />)
+      ) : (
+        <li>
+          <p class="text-center">No habits found</p>
+        </li>
+      )}
     </ul>
   );
 }
@@ -297,29 +291,17 @@ export function HabitHistoryList({ habit }: { habit: Habit }) {
 
 export function HabitsMoreButton({
   habitLength,
-  offset,
-  limit,
   count,
-  search = "",
 }: {
   habitLength: number;
-  limit: number;
-  offset: number;
   count: number;
-  search?: string;
 }) {
-  const newOffset = offset + limit;
-  const hxQuery: { offset: number; search?: string } = { offset: newOffset };
-  if (search) {
-    hxQuery.search = search;
-  }
   return (
     <form
       name="more-habits"
       class="mx-auto pb-4"
       id="more-habits"
       hx-get="/api/habits/more"
-      hx-vals={JSON.stringify(hxQuery)}
       hx-target="#habit-list"
       hx-swap="beforeend show:bottom"
       hx-select-oob="#more-habits"
@@ -399,13 +381,11 @@ export function HabitsBulkDeletion() {
 export function HabitContainer({
   count,
   limit,
-  offset,
   searchValue,
   habits,
 }: {
   limit: number;
   count: number;
-  offset: number;
   searchValue?: string;
   habits: Habit[];
 }) {
@@ -432,8 +412,7 @@ export function HabitContainer({
             hx-trigger="keyup changed delay:1000ms"
             hx-target="#habit-list"
             hx-swap="outerHTML"
-            hx-vals={JSON.stringify({ offset, limit })}
-            hx-select-oob="#more-habits"
+            hx-select-oob="#more-habits, #limit-radio"
             value={searchValue}
           />
         </div>
@@ -443,15 +422,9 @@ export function HabitContainer({
           </a>
         </div>
       </div>
-      <LimitPaginationRadio limit={limit} />
-      {HabitList({ habits })}
-      <HabitsMoreButton
-        habitLength={habits.length}
-        count={count}
-        offset={offset}
-        limit={limit}
-        search={searchValue}
-      />
+      <LimitPaginationRadio limit={limit} count={count} />
+      <HabitList habits={habits} />
+      <HabitsMoreButton habitLength={habits.length} count={count} />
     </div>
   );
 }

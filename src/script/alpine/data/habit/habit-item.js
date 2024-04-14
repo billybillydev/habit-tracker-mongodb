@@ -9,7 +9,7 @@
  * @property {(text: string) => void} updateTitle
  * @property {Function} manageItemInSet
  * @property {Function} handleDoubleClick
- * @property {Function} triggerHTMX
+ * @property {Function} toggleBulkElement
  * @property {Record<string, Function>} doubleClick
  */
 
@@ -25,7 +25,6 @@ export function habitItemData(itemId, title, triggerNotification) {
     triggerNotification,
     title,
     init() {
-      console.log(this.itemIdsToDelete);
       if (this.triggerNotification) {
         htmx.ajax("POST", "/api/notifications", {
           target: "#notification-list",
@@ -54,7 +53,7 @@ export function habitItemData(itemId, title, triggerNotification) {
         this.addItemToSet(this.itemId);
       }
     },
-    triggerHTMX() {
+    toggleBulkElement() {
       const bulkElement = document.querySelector("#bulk");
       if (bulkElement) {
         if (this.itemIdsToDelete.size === 1) {
@@ -69,7 +68,7 @@ export function habitItemData(itemId, title, triggerNotification) {
     },
     handleDoubleClick() {
       this.manageItemInSet();
-      this.triggerHTMX();
+      this.toggleBulkElement();
     },
     doubleClick: {
       ["@dblclick"]() {

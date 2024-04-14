@@ -1,4 +1,6 @@
 import { SessionUser } from "$auth";
+import { HonoRequest } from "hono";
+import { HTTPException } from "hono/http-exception";
 
 export type DateWithCompletion = {
     date: string;
@@ -40,4 +42,13 @@ export async function executeHandlerForSessionUser<T>(handler: (user: SessionUse
     throw new Error("Error session user");
   }
   return handler(user);
+}
+
+
+export function getURL(req: HonoRequest): URL {
+  let hxUrl = req.header("hx-current-url");
+  if (!hxUrl) {
+    throw new HTTPException(500);
+  }
+  return new URL(hxUrl);
 }
