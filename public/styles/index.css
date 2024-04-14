@@ -787,10 +787,6 @@ select {
   margin-right: auto;
 }
 
-.mb-8 {
-  margin-bottom: 2rem;
-}
-
 .block {
   display: block;
 }
@@ -869,10 +865,6 @@ select {
 
 .max-w-3xl {
   max-width: 48rem;
-}
-
-.max-w-screen-xl {
-  max-width: 1280px;
 }
 
 .max-w-xl {

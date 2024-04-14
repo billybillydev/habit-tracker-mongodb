@@ -27,7 +27,7 @@ export const habitsController = new Hono<{ Variables: AppVariables }>()
         offset: z.optional(z.coerce.number()),
       })
     ),
-    async ({ html, get, req }) => {
+    async ({ html, get, req, res }) => {
       const { limit = 4, offset = 0, search } = req.valid("query");
       const sessionUser = get("sessionUser");
       const [habits, count] = await executeHandlerForSessionUser(
@@ -38,14 +38,14 @@ export const habitsController = new Hono<{ Variables: AppVariables }>()
                   habitService.findByTitle(
                     search,
                     user.id,
-                    (!offset || offset === 0) ? limit : offset
+                    (!offset || offset === 0 || offset < limit) ? limit : offset
                   ),
                   habitService.countTitle(search, user.id),
                 ]
               : [
                   habitService.findManyByUserId(
                     user.id,
-                    (!offset || offset === 0) ? limit : offset
+                    (!offset || offset === 0 || offset < limit) ? limit : offset
                   ),
                   habitService.count(user.id),
                 ]

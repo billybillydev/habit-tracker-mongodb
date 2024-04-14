@@ -33,11 +33,6 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
     });
     console.log("in api/login/google");
     return ctx.header("HX-Redirect", url.href);
-    // return new Response(null, {
-    //     headers: {
-    //         "HX-Redirect": url.href
-    //     }
-    // });
   })
   .get(
     "/callback",

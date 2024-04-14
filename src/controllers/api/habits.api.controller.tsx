@@ -13,7 +13,7 @@ import {
   NotificationItem,
 } from "$components/notifications.component";
 import { LimitPaginationRadio } from "$components/pagination.component";
-import { executeHandlerForSessionUser, getURL as getHxURL } from "$lib";
+import { executeHandlerForSessionUser, getURL } from "$lib";
 import { getPaginationQueries, limitValues } from "$lib/pagination";
 import { habitService } from "$services/habits.service";
 import { zValidator } from "@hono/zod-validator";
@@ -135,7 +135,7 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
 
 export const habitApiController = new Hono<{ Variables: AppVariables }>()
   .get(async ({ html, get, req }) => {
-    const url = getHxURL(req);
+    const url = getURL(req);
     const { limit, offset, search } = getPaginationQueries(url);
     const sessionUser = get("sessionUser");
     const [habits, count] = await executeHandlerForSessionUser(
@@ -146,14 +146,14 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
                 habitService.findByTitle(
                   search,
                   user.id,
-                  !offset || offset === 0 ? limit : offset
+                  (!offset || offset === 0 || offset < limit) ? limit : offset
                 ),
                 habitService.countTitle(search, user.id),
               ]
             : [
                 habitService.findManyByUserId(
                   user.id,
-                  !offset || offset === 0 ? limit : offset
+                  (!offset || offset === 0 || offset < limit) ? limit : offset
                 ),
                 habitService.count(user.id),
               ]
@@ -224,10 +224,10 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       z.object({ limit: z.coerce.number() })
     ),
     async ({ html, get, req, res }) => {
-      const url = getHxURL(req);
+      const url = getURL(req);
       const { offset, search } = getPaginationQueries(url);
       const { limit } = req.valid("query");
-      const newOffset = !offset || offset === 0 ? limitValues[0] : offset;
+      const newOffset = (!offset || offset === 0 || offset < limit) ? limitValues[0] : offset;
       const sessionUser = get("sessionUser");
       const [habits, count] = await executeHandlerForSessionUser(
         async (user) =>
@@ -275,7 +275,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       })
     ),
     async ({ req, get, html, header }) => {
-      const url = getHxURL(req);
+      const url = getURL(req);
       const { limit, offset } = getPaginationQueries(url);
       const { value } = req.valid("query");
       const sessionUser = get("sessionUser");
@@ -286,11 +286,11 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
               ? habitService.findByTitle(
                   value,
                   user.id,
-                  !offset || offset === 0 ? limit : offset
+                  (!offset || offset === 0 || offset < limit) ? limit : offset
                 )
               : habitService.findManyByUserId(
                   user.id,
-                  !offset || offset === 0 ? limit : offset
+                  (!offset || offset === 0 || offset < limit) ? limit : offset
                 ),
             habitService.countTitle(value, user.id),
           ]),

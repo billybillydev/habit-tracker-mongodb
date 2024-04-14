@@ -30,7 +30,6 @@ export function HabitsPage({
               <Title text="Simple Habit Tracker" />
             </a>
           </Headings>
-          <hr />
           {sessionUser ? (
             <h2 class="text-center text-xl">Hello {sessionUser.name}</h2>
           ) : null}

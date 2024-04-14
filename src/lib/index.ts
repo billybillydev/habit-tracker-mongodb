@@ -46,9 +46,9 @@ export async function executeHandlerForSessionUser<T>(handler: (user: SessionUse
 
 
 export function getURL(req: HonoRequest): URL {
-  let hxUrl = req.header("hx-current-url");
-  if (!hxUrl) {
-    throw new HTTPException(500);
+  let href = req.header("hx-current-url") || req.url;
+  if (!href) {
+    throw new Error("href does not exist");
   }
-  return new URL(hxUrl);
+  return new URL(href);
 }
