@@ -303,6 +303,7 @@ export function HabitsMoreButton({
       hx-target="#habit-list"
       hx-swap="beforeend"
       hx-select-oob="#more-habits"
+      hx-vals={JSON.stringify({ currentHabitLength: habitLength })}
       x-data={`{ disableButton: false }`}
       {...{
         "@bulk-mode": "disableButton = $event.detail?.nbItemsToDelete > 0;",
