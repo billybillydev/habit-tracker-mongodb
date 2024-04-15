@@ -6,7 +6,7 @@ export const userSchema = sqliteTable("users", {
   id: text("id").primaryKey().notNull(),
   name: text("name").notNull(),
   googleId: text("google_id").unique(), // Use camelCase for column names
-  email: text("email").unique(),
+  email: text("email").unique().notNull(),
   password: text("password"),
   authType: text("auth_type", { enum: ["basic", "google"] }).notNull(),
 });

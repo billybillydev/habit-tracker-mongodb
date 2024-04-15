@@ -17,7 +17,10 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
     const state = generateState();
     const codeVerifier = generateCodeVerifier();
     const url = await auth.google.createAuthorizationURL(state, codeVerifier, {
-      scopes: ["https://www.googleapis.com/auth/userinfo.profile"],
+      scopes: [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+      ],
     });
     setCookie(ctx, "google_code_verifier", codeVerifier, {
       httpOnly: true,
@@ -31,7 +34,6 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
       maxAge: 60 * 10,
       path: "/",
     });
-    console.log("in api/login/google");
     return ctx.header("HX-Redirect", url.href);
   })
   .get(
@@ -57,7 +59,7 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
         code,
         codeVerifier
       );
-      const googleUserResult = await fetchApi<GoogleProfile>(
+      const googleUser = await fetchApi<GoogleProfile>(
         "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
         {
           headers: {
@@ -65,25 +67,35 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
           },
         }
       );
-      async function getUserOrCreate() {
-        const existingUser = await userService.getByGoogleId(
-          googleUserResult.id
-        );
+      const existingUser = await userService.google.getByGoogleId(
+        googleUser.id
+      );
 
-        return (
-          existingUser ??
-          (await userService.create({
-            googleId: googleUserResult.id,
-            name: googleUserResult.name,
-            id: generateId(15),
-            authType: "google",
-          }))
+      if (!existingUser && (await userService.getByEmail(googleUser.email))) {
+        setCookie(
+          ctx,
+          "error_google",
+          "Error Google Authentication: A user already exists with this email",
+          {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 10,
+            path: "/",
+          }
         );
+        return ctx.redirect("/login")
       }
-      const user = await getUserOrCreate();
+      const user = await userService.create({
+        googleId: googleUser.id,
+        name: googleUser.name,
+        email: googleUser.email,
+        id: generateId(15),
+        authType: "google",
+      });
 
       const session = await lucia.createSession(user.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
+
       setCookie(ctx, "lucia_session", sessionCookie.value, {
         domain: sessionCookie.attributes.domain,
         expires: sessionCookie.attributes.expires,
@@ -193,13 +205,8 @@ const logoutApiController = new Hono<{ Variables: AppVariables }>().post(
     }
     await lucia.invalidateSession(lucia_session);
     const sessionCookie = lucia.createBlankSessionCookie();
-    setCookie(
-      ctx,
-      "lucia_session",
-      sessionCookie.value
-      // sessionCookie.attributes
-    );
-    return ctx.res.headers.append("HX-Redirect", "/");
+    setCookie(ctx, "lucia_session", sessionCookie.value);
+    return ctx.header("HX-Redirect", "/");
   }
 );
 

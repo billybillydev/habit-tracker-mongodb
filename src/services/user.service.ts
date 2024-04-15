@@ -3,13 +3,7 @@ import { db } from "$db";
 import { userSchema, InsertUser } from "$db/schema";
 
 export const userService = {
-  async getById(userId: string) {
-    const result = await db.query.userSchema.findFirst({
-      where: (fields, { eq }) => eq(fields.id, userId),
-    });
-    return result;
-  },
-
+  google: {
   async getByGoogleId(googleId: string) {
     const result = await db
       .select({
@@ -21,6 +15,14 @@ export const userService = {
       .from(userSchema)
       .where(eq(userSchema.googleId, googleId))
       .get();
+    return result;
+  },
+
+  },
+  async getById(userId: string) {
+    const result = await db.query.userSchema.findFirst({
+      where: (fields, { eq }) => eq(fields.id, userId),
+    });
     return result;
   },
 

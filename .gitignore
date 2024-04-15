@@ -4,7 +4,11 @@ public/script/*
 public/mix-manigest.json
 
 *.sqlite
-db.session.sql
+*.session.sql
+
+migrations
+
+.vscode
 
 # dependencies
 /node_modules

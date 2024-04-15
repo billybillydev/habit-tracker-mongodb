@@ -8,18 +8,17 @@ import { config } from "$config";
 export type GoogleProfile = {
   id: string;
   name: string;
+  email: string;
+  verified_email: boolean;
   given_name: string;
   family_name: string;
-  link: string;
   picture: string;
-  gender: string;
-  locale: string;
 };
 
 export type SessionUser = {
   id: User["id"];
   name: User["name"];
-  email?: User["email"];
+  email: User["email"];
 };
 
 const { credentials, redirectURI } = config.google;

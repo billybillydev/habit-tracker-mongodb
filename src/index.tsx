@@ -48,7 +48,7 @@ app
     return html(<NotFoundPage />);
   })
   .onError((err, c) => {
-    console.error(`${err}`);
+    console.error((err));
     return c.text("An Error occured", 500);
   })
   .notFound(({ redirect }) => {
