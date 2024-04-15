@@ -155,36 +155,34 @@ export function HabitComponent({
       <h2 class={"text-xl font-medium"}>{item.title}</h2>
       <p class={"text-md"}>{item.description}</p>
       <HabitHistoryList habit={item} />
-      <template x-if={`!itemIdsToDelete.has(${item.id})`}>
-        <div class={"flex gap-x-4"}>
-          <InfoButton
-            class={
-              "px-3 py-2 rounded border text-sky-600 hover:bg-sky-600 hover:text-white"
-            }
-            text="Edit"
-            variant="solid"
-            hx-get={`/api/habits/${item.id}/edit`}
-            hx-target="body"
-            hx-swap="afterbegin"
-            hx-vals={JSON.stringify({
-              title: item.title,
-              description: item.description,
-              color: item.color,
-            })}
-          />
-          <DangerButton
-            class={
-              "px-3 py-2 rounded border text-red-600 hover:bg-red-600 hover:text-white"
-            }
-            text="Delete"
-            variant="solid"
-            hx-delete={`/api/habits/${item.id}`}
-            hx-swap="afterbegin"
-            hx-target="#notification-list"
-            hx-confirm="Are you sure ?"
-          />
-        </div>
-      </template>
+      <div class={"flex gap-x-4"} x-show={`!itemIdsToDelete.has(${item.id})`}>
+        <InfoButton
+          class={
+            "px-3 py-2 rounded border text-sky-600 hover:bg-sky-600 hover:text-white"
+          }
+          text="Edit"
+          variant="solid"
+          hx-get={`/api/habits/${item.id}/edit`}
+          hx-target="body"
+          hx-swap="afterbegin"
+          hx-vals={JSON.stringify({
+            title: item.title,
+            description: item.description,
+            color: item.color,
+          })}
+        />
+        <DangerButton
+          class={
+            "px-3 py-2 rounded border text-red-600 hover:bg-red-600 hover:text-white"
+          }
+          text="Delete"
+          variant="solid"
+          hx-delete={`/api/habits/${item.id}`}
+          hx-swap="afterbegin"
+          hx-target="#notification-list"
+          hx-confirm="Are you sure ?"
+        />
+      </div>
     </section>
   );
 }
@@ -303,7 +301,7 @@ export function HabitsMoreButton({
       id="more-habits"
       hx-get="/api/habits/more"
       hx-target="#habit-list"
-      hx-swap="beforeend show:bottom"
+      hx-swap="beforeend"
       hx-select-oob="#more-habits"
       x-data={`{ disableButton: false }`}
       {...{

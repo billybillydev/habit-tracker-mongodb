@@ -15,7 +15,6 @@ export function seoData(title) {
             if (document.title !== title) {
               document.title = title;
             }
-            console.log(htmx);
         },
         title,
     }
