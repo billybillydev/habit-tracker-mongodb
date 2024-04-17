@@ -17,10 +17,7 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
     const state = generateState();
     const codeVerifier = generateCodeVerifier();
     const url = await auth.google.createAuthorizationURL(state, codeVerifier, {
-      scopes: [
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/userinfo.email",
-      ],
+      scopes: ["profile", "email"],
     });
     setCookie(ctx, "google_code_verifier", codeVerifier, {
       httpOnly: true,
@@ -83,9 +80,9 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
             path: "/",
           }
         );
-        return ctx.redirect("/login")
+        return ctx.redirect("/login");
       }
-      const user = await userService.create({
+      const user = existingUser ?? await userService.create({
         googleId: googleUser.id,
         name: googleUser.name,
         email: googleUser.email,
@@ -95,7 +92,6 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
 
       const session = await lucia.createSession(user.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-
       setCookie(ctx, "lucia_session", sessionCookie.value, {
         domain: sessionCookie.attributes.domain,
         expires: sessionCookie.attributes.expires,
