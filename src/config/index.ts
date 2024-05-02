@@ -21,7 +21,7 @@ const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     GOOGLE_REDIRECT_URI_PATH: z.string(),
     HOST_URL: z.string().min(1),
-    PORT: z.string(),
+    PORT: z.coerce.number(),
     TURSO_API_KEY: z.string().min(1),
   },
   runtimeEnv: process.env,
@@ -41,12 +41,16 @@ export const config = {
         env.GOOGLE_CLIENT_SECRET || "find your value on google cloud console",
     },
     redirectURI: new URL(
-      env.HOST_URL + ":" + env.PORT + env.GOOGLE_REDIRECT_URI_PATH
+      env.NODE_ENV === "production"
+        ? env.HOST_URL + env.GOOGLE_REDIRECT_URI_PATH
+        : env.HOST_URL + ":" + env.PORT + env.GOOGLE_REDIRECT_URI_PATH
     ),
   },
-  baseURL: new URL(env.HOST_URL + ":" + env.PORT),
-  port: Number(env.PORT) || 3000,
+  baseURL: new URL(
+    env.NODE_ENV === "production" ? env.HOST_URL : env.HOST_URL + ":" + env.PORT
+  ),
+  port: env.PORT || 3000,
   turso: {
-    apiKey: env.TURSO_API_KEY
-  }
+    apiKey: env.TURSO_API_KEY,
+  },
 };

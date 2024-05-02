@@ -2,6 +2,7 @@
 
 public/script/*
 public/mix-manigest.json
+public/styles/index.css
 
 *.sqlite
 *.session.sql
@@ -36,10 +37,7 @@ yarn-error.log*
 
 # local env files
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 
 # vercel
 .vercel

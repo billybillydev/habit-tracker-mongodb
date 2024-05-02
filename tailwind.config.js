@@ -1,15 +1,10 @@
+
+import mosiuiMini from 'tailwindcss-mosiui-mini';
+
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./src/components/**/*.tsx",
-    "./src/controllers/**/*.tsx",
-    "./src/pages/**/*.tsx",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [
-    require("@tailwindcss/forms"),
-  ],
+export default {
+  content: ["src/**/*.{astro,html,js,jsx,svelte,ts,tsx,vue,css,md,mdx}"],
+  presets: [mosiuiMini],
+  plugins: [],
 };
 

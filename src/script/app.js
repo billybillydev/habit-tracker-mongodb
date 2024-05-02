@@ -1,4 +1,4 @@
-import Alpine from "./alpine";
+import Alpine from '$script/alpine/index.js';
 
 window.Alpine = Alpine;
 

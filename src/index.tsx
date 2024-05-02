@@ -55,6 +55,7 @@ app
     return redirect("/404");
   });
 
+  console.log(process.env.NODE_ENV)
 export default {
   port: config.port,
   fetch: app.fetch,
