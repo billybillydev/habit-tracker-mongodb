@@ -1,0 +1,19 @@
+# syntax=docker/dockerfile:1
+
+FROM node:20-slim as base
+
+LABEL fly_launch_runtime="Bun"
+
+RUN npm install -g bun
+
+WORKDIR /app
+
+# Install node modules
+COPY --link bun.lockb package.json ./
+
+RUN bun install
+
+ENV PORT 3000
+EXPOSE $PORT
+
+CMD ["bun", "run", "start:dev"]

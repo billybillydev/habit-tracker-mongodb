@@ -5,10 +5,6 @@ import * as schema from '$db/schema';
 
 const options = (() => {
   switch (config.db.type) {
-    case "local":
-      return {
-        url: "file:local.sqlite",
-      };
     case "remote":
       return {
         url: config.db.url,
@@ -19,6 +15,11 @@ const options = (() => {
         url: "file:local.sqlite",
         syncUrl: config.db.url,
         authToken: config.db.authToken,
+      };
+    case "local":
+    default:
+      return {
+        url: "file:local.sqlite",
       };
   }
 })();

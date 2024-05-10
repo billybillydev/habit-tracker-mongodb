@@ -6,12 +6,12 @@
     "dev": "bun run --hot src/index.tsx",
     "tailwind:dev": "bunx tailwindcss -i ./src/styles/index.css -o ./public/styles/index.css --watch",
     "tailwind:prod": "bunx tailwindcss -i ./src/styles/index.css -o ./public/styles/index.css",
-    "db:generate": "bunx drizzle-kit generate:sqlite",
-    "db:studio": "bunx drizzle-kit studio",
+    "db:generate": "drizzle-kit generate:sqlite",
+    "db:studio": "drizzle-kit studio",
     "db:migrate": "bun run src/db/migrate.ts",
     "mix": "bunx mix watch",
     "start:dev": "concurrently \"bun dev\" \"bun tailwind:dev\" \"bun mix\"",
-    "start:prod": "bun run src/index.tsx && bun run tailwind:prod && bunx mix"
+    "start:prod": "bun db:generate && bun db:migrate && bun run src/index.tsx && bun run tailwind:prod && bunx mix"
   },
   "dependencies": {
     "@alpinejs/collapse": "^3.13.10",
@@ -38,13 +38,13 @@
     "oslo": "^1.2.0",
     "tailwindcss": "^3.4.3",
     "tailwindcss-mosiui-mini": "^0.1.4",
+    "drizzle-kit": "^0.19.13",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/alpinejs": "^3.13.10",
     "@types/bun": "latest",
     "concurrently": "^8.2.2",
-    "drizzle-kit": "^0.19.13",
     "typed-html": "^3.0.1",
     "typed-htmx": "^0.2.1"
   },

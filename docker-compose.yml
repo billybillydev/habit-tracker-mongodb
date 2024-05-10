@@ -1,13 +1,35 @@
 version: '3'
 services:
-  bun-app:
+  app:
     build:
       context: .
+      # target: production
+      dockerfile: Dockerfile.production
+   
+    ports:
+      - "3001:3000"
     volumes:
       - ./:/app
       - /app/node_modules
+    environment:
+      NODE_ENV: production
+    env_file:
+      - ./.env
+
+  dev:
+    build:
+      context: .
+      # target: development
+      dockerfile: Dockerfile.development
     ports:
-     - 3000:3000
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+    env_file:
+      - ./.env
   # db:
   #   image: ghcr.io/tursodatabase/libsql-server:latest
   #   platform: linux/amd64
