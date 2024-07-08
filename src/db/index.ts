@@ -1,33 +1,31 @@
 import { config } from "$config";
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-import * as schema from '$db/schema';
+import { env } from "bun";
+import { connect, disconnect, set } from "mongoose";
 
-const options = (() => {
-  switch (config.db.type) {
-    case "remote":
-      return {
-        url: config.db.url,
-        authToken: config.db.authToken,
-      };
-    case "local-replica":
-      return {
-        url: "file:local.sqlite",
-        syncUrl: config.db.url,
-        authToken: config.db.authToken,
-      };
-    case "local":
-    default:
-      return {
-        url: "file:local.sqlite",
-      };
+export const connectDB = async () => {
+  console.log(config.db.url);
+  try {
+    if (env.NODE_ENV === "development") {
+      set("debug", true);
+    }
+    await connect(config.db.url);
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error("Error connecting to MongoDB", err);
   }
-})();
+};
 
-export const client = createClient(options);
+export const disconnectDB = async () => {
+  try {
+    await disconnect();
+    console.log('Disconnected from MongoDB');
+  } catch (err) {
+    console.error('Error disconnecting from MongoDB', err);
+  }
+};
 
-if (config.db.type === "local-replica") {
-  await client.sync();
+export async function handleDisconnectDBWhenExit(signal: string) {
+  console.log(`Received ${signal}. Closing MongoDB connection...`);
+  await disconnectDB();
+  process.exit(0);
 }
-
-export const db = drizzle(client, { schema, logger: false });

@@ -4,7 +4,7 @@ import { habitsController } from "$controllers/habits.controller";
 import { homeController } from "$controllers/home.controller";
 import { loginController } from "$controllers/login.controller";
 import { registerController } from "$controllers/register.controller";
-import { db } from "$db";
+import { connectDB, handleDisconnectDBWhenExit } from "$db";
 import { htmxMiddleware } from "$middlewares/htmx.middleware";
 import { sessionMiddleware } from "$middlewares/session.middleware";
 import { Hono } from "hono";
@@ -15,26 +15,28 @@ import { NotFoundPage } from "$pages/404.page";
 type Cookie = Partial<{
   google_code_verifier: string;
   google_state: string;
-  lucia_session: string;
+  auth_session: string;
 }>;
 
 export type AppVariables = {
   isHTMX?: boolean;
   lucia: typeof lucia;
   auth: typeof auth;
-  db: typeof db;
   cookie: Cookie;
   sessionUser?: SessionUser;
   isAuth?: boolean;
 };
 
 const app = new Hono<{ Variables: AppVariables }>();
+connectDB();
+
+// process.on("SIGINT", handleDisconnectDBWhenExit);
+// process.on("SIGTERM", handleDisconnectDBWhenExit);
 
 app
   .use("/public/*", serveStatic({ root: "./" }))
   .use(async ({ set }, next) => {
     set("auth", auth);
-    set("db", db);
     set("lucia", lucia);
     await next();
   })
@@ -48,14 +50,14 @@ app
     return html(<NotFoundPage />);
   })
   .onError((err, c) => {
-    console.error((err));
+    console.error(err);
     return c.text("An Error occured", 500);
   })
   .notFound(({ redirect }) => {
     return redirect("/404");
   });
 
-  console.log(process.env.NODE_ENV)
+console.log(process.env.NODE_ENV);
 export default {
   port: config.port,
   fetch: app.fetch,

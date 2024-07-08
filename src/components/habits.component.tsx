@@ -7,7 +7,7 @@ import {
 import { FormField } from "$components/fields.component";
 import { Notification } from "$components/notifications.component";
 import { LimitPaginationRadio } from "$components/pagination.component";
-import { Habit } from "$db/schema";
+import { Habit } from "$db/models";
 import { generateDatesByNumberOfDays } from "$lib";
 import classNames from "classnames";
 
@@ -61,7 +61,7 @@ export function CreateHabitForm() {
 }
 
 export type EditHabitProps = {
-  id: Habit["id"];
+  id: Habit["_id"];
   title: Habit["title"];
   description: Habit["description"];
   modalRef: string;
@@ -150,19 +150,19 @@ export function HabitComponent({
         "h-full rounded-md border border-slate-300 p-5 flex flex-col gap-y-4 max-w-xl &>p:text-slate-400",
         className
       )}
-      x-bind:class={`{ "bg-red-700": itemIdsToDelete.has(${item.id}) }`}
+      x-bind:class={`{ "bg-red-700": itemIdsToDelete.has("${item._id}") }`}
     >
       <h2 class={"text-xl font-medium"}>{item.title}</h2>
       <p class={"text-md"}>{item.description}</p>
       <HabitHistoryList habit={item} />
-      <div class={"flex gap-x-4"} x-show={`!itemIdsToDelete.has(${item.id})`}>
+      <div class={"flex gap-x-4"} x-show={`!itemIdsToDelete.has("${item._id}")`}>
         <InfoButton
           class={
             "px-3 py-2 rounded border text-sky-600 hover:bg-sky-600 hover:text-white"
           }
           text="Edit"
           variant="solid"
-          hx-get={`/api/habits/${item.id}/edit`}
+          hx-get={`/api/habits/${item._id}/edit`}
           hx-target="body"
           hx-swap="afterbegin"
           hx-vals={JSON.stringify({
@@ -177,7 +177,7 @@ export function HabitComponent({
           }
           text="Delete"
           variant="solid"
-          hx-delete={`/api/habits/${item.id}`}
+          hx-delete={`/api/habits/${item._id}`}
           hx-swap="afterbegin"
           hx-target="#notification-list"
           hx-confirm="Are you sure ?"
@@ -199,11 +199,11 @@ export function HabitItem({
 }) {
   return (
     <li
-      id={`habit-${item.id}`}
+      id={`habit-${item._id}`}
       x-bind:title={"title"}
       x-data={`
         habitItem(
-          ${item.id},
+          "${item._id}",
           "double click on this block to switch on deletion mode",
           ${
             triggerNotification
@@ -258,7 +258,7 @@ export function HabitHistoryItem({
       class={`w-5 h-5 rounded cursor-pointer`}
       style={`background-color: ${completed ? habit.color : "black"}`}
       title={date}
-      hx-post={`/api/habits/${habit.id}/toggle/${date}`}
+      hx-post={`/api/habits/${habit._id}/toggle/${date}`}
       hx-target="this"
       hx-swap="outerHTML"
     />
@@ -277,7 +277,7 @@ export function HabitHistoryList({ habit }: { habit: Habit }) {
             date={formatedDate}
             completed={
               !!habit.histories?.some(
-                (history) => history.date === formatedDate
+                (history) => history === formatedDate
               )
             }
           />

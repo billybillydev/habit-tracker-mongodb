@@ -44,14 +44,14 @@ To properly run this project, it bests to firstly provide an .env file with this
 - DATABASE_CONNECTION_TYPE
 - LOG_LEVEL
 - HOST_URL
-- PORT?
+- SERVER_PORT?
 - GOOGLE_CLIENT_ID
 - GOOGLE_CLIENT_SECRET
 - GOOGLE_REDIRECT_URI_PATH
-- DATABASE_URL
+- MONGODB_URL
 - DATABASE_AUTH_TOKEN
 
-_PS: PORT variable is optional (default value is 3000)_
+_PS: SERVER_PORT variable is optional (default value is 3000)_
 
 To install dependencies:
 ```sh

@@ -4,34 +4,24 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]),
-    DATABASE_CONNECTION_TYPE: z.enum(["local", "remote", "local-replica"]),
-    DATABASE_URL: z.string().min(1),
-    DATABASE_AUTH_TOKEN: z
-      .string()
-      .optional()
-      .refine((s) => {
-        // not needed for local only
-        const type = process.env.DATABASE_CONNECTION_TYPE;
-        return type === "remote" || type === "local-replica"
-          ? s && s.length > 0
-          : true;
-      }),
+    MONGO_INITDB_DATABASE: z.string().min(1),
+    MONGO_INITDB_ROOT_PASSWORD: z.string().min(1),
+    MONGO_INITDB_ROOT_USERNAME: z.string().min(1),
+    DATABASE_HOST: z.string().min(1),
+    DATABASE_PORT: z.coerce.number(),
     NODE_ENV: z.enum(["development", "production"]),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
     GOOGLE_REDIRECT_URI_PATH: z.string(),
     HOST_URL: z.string().min(1),
-    PORT: z.coerce.number(),
-    TURSO_API_KEY: z.string().min(1),
+    SERVER_PORT: z.coerce.number(),
   },
   runtimeEnv: process.env,
 });
 
 export const config = {
   db: {
-    authToken: env.DATABASE_AUTH_TOKEN,
-    url: env.DATABASE_URL,
-    type: env.DATABASE_CONNECTION_TYPE,
+    url: `mongodb://${env.DATABASE_HOST}:${env.DATABASE_PORT}/?authSource=admin`,
   },
   google: {
     credentials: {
@@ -43,14 +33,13 @@ export const config = {
     redirectURI: new URL(
       env.NODE_ENV === "production"
         ? env.HOST_URL + env.GOOGLE_REDIRECT_URI_PATH
-        : env.HOST_URL + ":" + env.PORT + env.GOOGLE_REDIRECT_URI_PATH
+        : env.HOST_URL + ":" + env.SERVER_PORT + env.GOOGLE_REDIRECT_URI_PATH
     ),
   },
   baseURL: new URL(
-    env.NODE_ENV === "production" ? env.HOST_URL : env.HOST_URL + ":" + env.PORT
+    env.NODE_ENV === "production"
+      ? env.HOST_URL
+      : env.HOST_URL + ":" + env.SERVER_PORT
   ),
-  port: env.PORT || 3000,
-  turso: {
-    apiKey: env.TURSO_API_KEY,
-  },
+  port: env.SERVER_PORT || 3000,
 };
