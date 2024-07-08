@@ -1,71 +1,45 @@
-import { eq } from "drizzle-orm";
-import { db } from "$db";
-import { userSchema, InsertUser } from "$db/schema";
+import { User } from "$db/models";
+
 
 export const userService = {
   google: {
   async getByGoogleId(googleId: string) {
-    const result = await db
-      .select({
-        id: userSchema.id,
-        name: userSchema.name,
-        googleId: userSchema.googleId,
-        authType: userSchema.authType,
-      })
-      .from(userSchema)
-      .where(eq(userSchema.googleId, googleId))
-      .get();
+    const result = await User.findOne({ googleId });
     return result;
   },
 
   },
   async getById(userId: string) {
-    const result = await db.query.userSchema.findFirst({
-      where: (fields, { eq }) => eq(fields.id, userId),
-    });
+    const result = await User.findById(userId);
     return result;
   },
 
   async getByEmail(email: string) {
-    const result = await db
-      .select({
-        id: userSchema.id,
-        name: userSchema.name,
-        email: userSchema.email,
-        password: userSchema.password,
-        authType: userSchema.authType,
-      })
-      .from(userSchema)
-      .where(eq(userSchema.email, email))
-      .get();
+    const result = await User.findOne({ email });
 
     return result;
   },
 
-  async deleteById(userId: string) {
-    const result = await db
-      .delete(userSchema)
-      .where(eq(userSchema.id, userId))
-      .returning()
-      .get();
-    if (!result) {
-      throw new Error("User was not deleted.");
-    }
+  // async deleteById(userId: string) {
+  //   const result = await db
+  //     .delete(userSchema)
+  //     .where(eq(userSchema.id, userId))
+  //     .returning()
+  //     .get();
+  //   if (!result) {
+  //     throw new Error("User was not deleted.");
+  //   }
 
-    return result;
-  },
+  //   return result;
+  // },
 
-  async create(createData: InsertUser) {
-    const result = await db
-      .insert(userSchema)
-      .values(createData)
-      .returning()
-      .get();
+  async create(createData: User) {
+    const result = new User(createData);
 
     if (!result) {
       throw new Error("User was not created.");
     }
-
+    await result.save();
     return result;
   },
 

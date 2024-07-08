@@ -6,7 +6,7 @@ import {
 } from "$components/habits.component";
 import { Headings, Title } from "$components/headings.component";
 import { RootLayout } from "$components/layouts.component";
-import { Habit } from "$db/schema";
+import { Habit } from "$db/models";
 
 export function HabitsPage({
   habits,

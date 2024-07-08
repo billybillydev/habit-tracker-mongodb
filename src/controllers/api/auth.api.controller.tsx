@@ -82,17 +82,19 @@ const googleAuthApiController = new Hono<{ Variables: AppVariables }>()
         );
         return ctx.redirect("/login");
       }
-      const user = existingUser ?? await userService.create({
-        googleId: googleUser.id,
-        name: googleUser.name,
-        email: googleUser.email,
-        id: generateId(15),
-        authType: "google",
-      });
+      const user =
+        existingUser ??
+        (await userService.create({
+          _id: generateId(15),
+          googleId: googleUser.id,
+          name: googleUser.name,
+          email: googleUser.email,
+          authType: "google",
+        }));
 
-      const session = await lucia.createSession(user.id, {});
+      const session = await lucia.createSession(user._id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-      setCookie(ctx, "lucia_session", sessionCookie.value, {
+      setCookie(ctx, sessionCookie.name, sessionCookie.value, {
         domain: sessionCookie.attributes.domain,
         expires: sessionCookie.attributes.expires,
         httpOnly: sessionCookie.attributes.httpOnly,
@@ -131,9 +133,10 @@ const loginApiController = new Hono<{ Variables: AppVariables }>()
       if (!validPassword) {
         return ctx.text("Invalid email or password", 400);
       }
-      const session = await lucia.createSession(user.id, {});
+      console.log("in login controller", { user })
+      const session = await lucia.createSession(String(user._id), {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-      setCookie(ctx, "lucia_session", sessionCookie.value, {
+      setCookie(ctx, sessionCookie.name, sessionCookie.value, {
         domain: sessionCookie.attributes.domain,
         expires: sessionCookie.attributes.expires,
         httpOnly: sessionCookie.attributes.httpOnly,
@@ -167,15 +170,16 @@ const registerApiController = new Hono<{ Variables: AppVariables }>().post(
     }
     const hashedPassword = await Bun.password.hash(password);
     const newUser = await userService.create({
-      id: generateId(15),
+      _id: generateId(15),
       name,
       email,
       password: hashedPassword,
       authType: "basic",
     });
-    const session = await lucia.createSession(newUser.id, {});
+    const session = await lucia.createSession(newUser._id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
-    setCookie(ctx, "lucia_session", sessionCookie.value, {
+
+    setCookie(ctx, sessionCookie.name, sessionCookie.value, {
       domain: sessionCookie.attributes.domain,
       expires: sessionCookie.attributes.expires,
       httpOnly: sessionCookie.attributes.httpOnly,
@@ -194,14 +198,14 @@ const logoutApiController = new Hono<{ Variables: AppVariables }>().post(
   "/",
   async (ctx) => {
     const lucia = ctx.get("lucia");
-    const lucia_session = getCookie(ctx, "lucia_session");
+    const auth_session = getCookie(ctx, "auth_session");
 
-    if (!lucia_session) {
+    if (!auth_session) {
       throw new Error("Lucia session doesn't exist");
     }
-    await lucia.invalidateSession(lucia_session);
+    await lucia.invalidateSession(auth_session);
     const sessionCookie = lucia.createBlankSessionCookie();
-    setCookie(ctx, "lucia_session", sessionCookie.value);
+    setCookie(ctx, "auth_session", sessionCookie.value);
     return ctx.header("HX-Redirect", "/");
   }
 );

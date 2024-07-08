@@ -1,20 +1,25 @@
-version: '3'
+version: '3.9'
 services:
-  app:
-    build:
-      context: .
-      # target: production
-      dockerfile: Dockerfile.production
+  # app:
+  #   build:
+  #     context: .
+  #     # target: production
+  #     dockerfile: Dockerfile.production
    
-    ports:
-      - "3001:3000"
-    volumes:
-      - ./:/app
-      - /app/node_modules
-    environment:
-      NODE_ENV: production
-    env_file:
-      - ./.env
+  #   ports:
+  #     - "3001:3000"
+  #   volumes:
+  #     - ./:/app
+  #     - /app/node_modules
+  #   environment:
+  #     NODE_ENV: production
+  #   env_file:
+  #     - ./.env.development
+  #        required: true
+  #   depends_on:
+  #     - mongo
+  #   networks:
+  #     - node-network
 
   dev:
     build:
@@ -22,21 +27,29 @@ services:
       # target: development
       dockerfile: Dockerfile.development
     ports:
-      - "3000:3000"
+      - ${SERVER_PORT}:${SERVER_PORT}
     volumes:
       - ./:/app
       - /app/node_modules
-    environment:
-      NODE_ENV: development
-    env_file:
-      - ./.env
-  # db:
-  #   image: ghcr.io/tursodatabase/libsql-server:latest
-  #   platform: linux/amd64
-  #   ports:
-  #     - "8080:8080"
-  #     - "5001:5001"
-  #   environment:
-  #     - SQLD_NODE=primary
-  #   volumes:
-  #     - ./data/libsql:/var/lib/sqld
+    depends_on:
+      - mongo
+    networks:
+      - node-network
+
+  mongo:
+    image: mongo:6-jammy
+    container_name: ${DATABASE_HOST}
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - node-network
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  node-network:
+    driver: bridge

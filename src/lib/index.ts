@@ -1,11 +1,5 @@
 import { SessionUser } from "$auth";
 import { HonoRequest } from "hono";
-import { HTTPException } from "hono/http-exception";
-
-export type DateWithCompletion = {
-    date: string;
-    completed: boolean;
-}
 
 export function generateDatesByNumberOfDays(numberOfDays: number) {
     const today = new Date();
@@ -16,18 +10,17 @@ export function generateDatesByNumberOfDays(numberOfDays: number) {
     });
 }
 
-export function generateDatesWithCompletion(numberOfDays: number): DateWithCompletion[] {
+export function generateDatesWithCompletion(numberOfDays: number): string[] {
   const completedRatio = 0.3; // 30% chance of completed
 
   const dates = generateDatesByNumberOfDays(numberOfDays);
-
-  return dates.map((date) => {
-    const completed = Math.random() < completedRatio;
-    return {
-      date: date.toISOString().slice(0, 10), // Format date (YYYY-MM-DD)
-      completed,
+  const completedDates: string[] = []
+  dates.forEach((date) => {
+    if (Math.random() < completedRatio) {
+      completedDates.push(date.toISOString().slice(0, 10));
     };
   });
+  return completedDates;
 }
 
 export function fetchApi<T>(url: string | Request | URL, init?: FetchRequestInit | undefined): Promise<T> {

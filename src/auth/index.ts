@@ -1,9 +1,9 @@
-import { Google } from "arctic";
-import { LibSQLAdapter } from "@lucia-auth/adapter-sqlite";
-import { Lucia } from "lucia";
-import { User } from "$db/schema";
-import { client } from "$db";
 import { config } from "$config";
+import { type User } from "$db/models";
+import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
+import { Google } from "arctic";
+import { Lucia } from "lucia";
+import mongoose from "mongoose";
 
 export type GoogleProfile = {
   id: string;
@@ -16,7 +16,7 @@ export type GoogleProfile = {
 };
 
 export type SessionUser = {
-  id: User["id"];
+  id: string;
   name: User["name"];
   email: User["email"];
 };
@@ -29,10 +29,10 @@ const googleAuth = new Google(
   redirectURI.href
 );
 
-const adapter = new LibSQLAdapter(client, {
-  user: "users",
-  session: "sessions",
-});
+const adapter = new MongodbAdapter(
+  mongoose.connection.collection("sessions"),
+  mongoose.connection.collection("users")
+);
 
 
 export const lucia = new Lucia(adapter, {
@@ -41,12 +41,14 @@ export const lucia = new Lucia(adapter, {
       secure: process.env.NODE_ENV === "production",
     },
   },
+  getSessionAttributes(databaseSessionAttributes) {
+    return databaseSessionAttributes
+  },
   getUserAttributes: (attributes) => {
     return {
       // we don't need to expose the hashed password!
       email: attributes.email,
       name: attributes.name,
-      id: attributes.id,
     };
   },
 });
