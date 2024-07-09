@@ -3,7 +3,6 @@ import { env } from "bun";
 import { connect, disconnect, set } from "mongoose";
 
 export const connectDB = async () => {
-  console.log(config.db.url);
   try {
     if (env.NODE_ENV === "development") {
       set("debug", true);

@@ -209,52 +209,53 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
   //     );
   //   }
   // )
-  // .get(
-  //   "/more",
-  //   zValidator(
-  //     "query",
-  //     z.object({ limit: z.coerce.number(), currentHabitLength: z.coerce.number() })
-  //   ),
-  //   async ({ html, get, req, res }) => {
-  //     const url = getURL(req);
-  //     const { page, search } = getPaginationQueries(url);
-  //     const { limit, currentHabitLength } = req.valid("query");
-  //     const sessionUser = get("sessionUser");
-  //     const [habits, count] = await executeHandlerForSessionUser(
-  //       async (user) =>
-  //         Promise.all(
-  //           search
-  //             ? [
-  //                 habitService.findByTitle(search, user.id, limit, currentHabitLength),
-  //                 habitService.countTitle(search, user.id),
-  //               ]
-  //             : [
-  //                 habitService.findManyWithCountByUserId(user.id, limit, currentHabitLength),
-  //                 habitService.count(user.id),
-  //               ]
-  //         ),
-  //       sessionUser
-  //     );
-  //     url.searchParams.set("limit", String(limit));
-  //     url.searchParams.set("page", String(page + 1));
-  //     if (search) {
-  //       url.searchParams.set("search", search);
-  //     }
-  //     url.searchParams.sort();
-  //     res.headers.append("HX-Push-Url", url.href);
-  //     return html(
-  //       <>
-  //         {habits.map((habit) => (
-  //           <HabitItem item={habit} />
-  //         ))}
-  //         <HabitsMoreButton
-  //           habitLength={currentHabitLength + habits.length}
-  //           count={count}
-  //         />
-  //       </>
-  //     );
-  //   }
-  // )
+  .get(
+    "/more",
+    zValidator(
+      "query",
+      z.object({ limit: z.coerce.number(), currentHabitLength: z.coerce.number() })
+    ),
+    async ({ html, get, req, res }) => {
+      const url = getURL(req);
+      const { page, search } = getPaginationQueries(url);
+      const { limit, currentHabitLength } = req.valid("query");
+      const sessionUser = get("sessionUser");
+      const [habits, count] = await executeHandlerForSessionUser(
+        async (user) =>
+          search
+            ? await habitService.findManyWithCountByTitle(
+                search,
+                user.id,
+                limit,
+                page ? page * limit : limit
+              )
+            : await habitService.findManyWithCountByUserId(
+                user.id,
+                limit,
+                page ? page * limit : limit
+              ),
+        sessionUser
+      );
+      url.searchParams.set("limit", String(limit));
+      url.searchParams.set("page", String(page + 1));
+      if (search) {
+        url.searchParams.set("search", search);
+      }
+      url.searchParams.sort();
+      res.headers.append("HX-Push-Url", url.href);
+      return html(
+        <>
+          {habits.map((habit) => (
+            <HabitItem item={habit} />
+          ))}
+          <HabitsMoreButton
+            habitLength={currentHabitLength + habits.length}
+            count={count}
+          />
+        </>
+      );
+    }
+  )
   .get(
     "/search",
     zValidator(

@@ -1,6 +1,5 @@
 import { Habit } from "$db/models";
 import { generateDatesWithCompletion } from "$lib";
-import { ObjectId, Types } from "mongoose";
 
 export const habitService = {
   async seed(userId: string) {
@@ -25,6 +24,7 @@ export const habitService = {
             { $match: { userId } },
             { $skip: skip },
             { $limit: limit },
+            { $sort: { updateAt: 1 } },
           ],
         },
       },
@@ -50,6 +50,7 @@ export const habitService = {
             },
             { $skip: skip },
             { $limit: limit },
+            { $sort: { updateAt: 1 } },
           ],
         },
       },
