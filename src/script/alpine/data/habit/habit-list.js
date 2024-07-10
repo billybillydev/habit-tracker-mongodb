@@ -1,7 +1,7 @@
 /**
  * Type for HabitListData function
  * @typedef {Object} HabitListData
- * @property {Set<number>} itemIdsToDelete
+ * @property {Set<string>} itemIdsToDelete
  * @property {Function} handleEvent
  * @property {Record<string, Function>} selectAllEvent
  */
@@ -22,7 +22,7 @@ export function habitListData() {
       const items = document.querySelectorAll("#habit-list>li");
       if (event.detail?.selectedAll) {
         this.itemIdsToDelete = new Set(
-          Array.from(items).map((item) => Number(item.id.split("-")[1]))
+          Array.from(items).map((item) => item.id.split("-")[1])
         );
       } else {
         this.itemIdsToDelete.clear();

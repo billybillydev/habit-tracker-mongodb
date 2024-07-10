@@ -153,9 +153,16 @@ export function HabitComponent({
       x-bind:class={`{ "bg-red-700": itemIdsToDelete.has("${item._id}") }`}
     >
       <h2 class={"text-xl font-medium"}>{item.title}</h2>
+      <p class="text-xs italic font-thin">
+        Last update:{" "}
+        {item.updatedAt.toLocaleString("en", { dateStyle: "full", timeStyle: "long" })}
+      </p>
       <p class={"text-md"}>{item.description}</p>
       <HabitHistoryList habit={item} />
-      <div class={"flex gap-x-4"} x-show={`!itemIdsToDelete.has("${item._id}")`}>
+      <div
+        class={"flex gap-x-4"}
+        x-show={`!itemIdsToDelete.has("${item._id}")`}
+      >
         <InfoButton
           class={
             "px-3 py-2 rounded border text-sky-600 hover:bg-sky-600 hover:text-white"
@@ -266,20 +273,16 @@ export function HabitHistoryItem({
 }
 
 export function HabitHistoryList({ habit }: { habit: Habit }) {
-  const dates = generateDatesByNumberOfDays(90);
+  const datesbyNumberOfDays = generateDatesByNumberOfDays(90);
   return (
     <ul class={"flex gap-1 flex-wrap"}>
-      {dates.map((date) => {
+      {datesbyNumberOfDays.map((date) => {
         const formatedDate = date.toISOString().slice(0, 10);
         return (
           <HabitHistoryItem
             habit={habit}
             date={formatedDate}
-            completed={
-              !!habit.histories?.some(
-                (history) => history === formatedDate
-              )
-            }
+            completed={habit.histories.includes(formatedDate)}
           />
         );
       })}

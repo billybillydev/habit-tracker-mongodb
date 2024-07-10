@@ -4,7 +4,7 @@ const userSchema = new Schema({
   _id: { type: String, required: true },
   name: {
     type: String,
-    required: true,
+    required: [true, "Name is required"],
   },
   googleId: {
     type: String,
@@ -12,16 +12,21 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: [true, "Email is required"],
     unique: true, // Ensure that the email is unique
+    validate: {
+      validator: function (v: string) {
+        return /^\w+@[a-zA-Z_]+?\.[a-zA-Z]/.test(v);
+      },
+      message: ({ value }: { value: string }) => `${value} is not a valid email!`,
+    },
   },
   password: {
     type: String,
-    // select: false,
   },
   authType: {
     type: String,
-    required: true,
+    required: [true, "Auth type is required"],
     enum: ["basic", "google"], // Restrict values to "basic" or "google"
   },
 });
