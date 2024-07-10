@@ -3,7 +3,7 @@
  * @typedef {Object} HabitItemData
  * @property {import("$components/notifications.component").Notification} [triggerNotification]
  * @property {string} title
- * @property {number} itemId
+ * @property {string} itemId
  * @property {Function} addItemToSet
  * @property {Function} deleteItemFromSet
  * @property {(text: string) => void} updateTitle
@@ -15,7 +15,7 @@
 
 /**
  * @param {string} title
- * @param {number} itemId
+ * @param {string} itemId
  * @param {import("$components/notifications.component").Notification} [triggerNotification]
  * @return {import("alpinejs").AlpineComponent<HabitItemData>}
  */
