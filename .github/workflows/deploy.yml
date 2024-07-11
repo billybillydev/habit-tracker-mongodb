@@ -1,0 +1,20 @@
+name: Fly Deployment on Merge
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+jobs:
+  deploy_when_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    concurrency: deploy-group 
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+        with:
+          version: 0.2.55
+      - run: bun fly:deploy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

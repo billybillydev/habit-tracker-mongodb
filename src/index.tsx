@@ -30,8 +30,8 @@ export type AppVariables = {
 const app = new Hono<{ Variables: AppVariables }>();
 connectDB();
 
-// process.on("SIGINT", handleDisconnectDBWhenExit);
-// process.on("SIGTERM", handleDisconnectDBWhenExit);
+process.on("SIGINT", handleDisconnectDBWhenExit);
+process.on("SIGTERM", handleDisconnectDBWhenExit);
 
 app
   .use("/public/*", serveStatic({ root: "./" }))
