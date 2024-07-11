@@ -8,7 +8,8 @@ export const env = createEnv({
     MONGO_INITDB_ROOT_PASSWORD: z.string().min(1),
     MONGO_INITDB_ROOT_USERNAME: z.string().min(1),
     DATABASE_HOST: z.string().min(1),
-    DATABASE_PORT: z.coerce.number(),
+    DATABASE_PORT: z.optional(z.coerce.number()),
+    DATABASE_CLUSTER: z.optional(z.string().min(1)),
     NODE_ENV: z.enum(["development", "production"]),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
@@ -19,9 +20,11 @@ export const env = createEnv({
   runtimeEnv: process.env,
 });
 
+const devMongoURI = `mongodb://${env.DATABASE_HOST}:${env.DATABASE_PORT}/?authSource=admin`;
+const prodMongoURI = `mongodb+srv://${env.MONGO_INITDB_ROOT_USERNAME}:${env.MONGO_INITDB_ROOT_PASSWORD}@${env.DATABASE_HOST}/?retryWrites=true&w=majority&appName=${env.DATABASE_CLUSTER}`;
 export const config = {
   db: {
-    url: `mongodb://${env.DATABASE_HOST}:${env.DATABASE_PORT}/?authSource=admin`,
+    url: env.NODE_ENV === "production" ? prodMongoURI : devMongoURI,
   },
   google: {
     credentials: {

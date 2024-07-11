@@ -6,14 +6,13 @@
     "dev": "bun run --hot src/index.tsx",
     "tailwind:dev": "bunx tailwindcss -i ./src/styles/index.css -o ./public/styles/index.css --watch",
     "tailwind:prod": "bunx tailwindcss -i ./src/styles/index.css -o ./public/styles/index.css",
-    "db:generate": "drizzle-kit generate:sqlite",
-    "db:studio": "drizzle-kit studio",
-    "db:migrate": "bun run src/db/migrate.ts",
     "mix": "bunx mix watch",
     "start:dev": "concurrently \"bun dev\" \"bun tailwind:dev\" \"bun mix\"",
-    "start:prod": "bun db:generate && bun db:migrate && bun run src/index.tsx && bun run tailwind:prod && bunx mix",
-    "docker:dev:up": "docker compose --env-file ./.env.development up --build",
-    "docker:dev:down": "docker compose --env-file ./.env.development down"
+    "start:prod": "bun tailwind:prod && bunx mix && NODE_ENV=production bun run src/index.tsx",
+    "docker:dev:up": "docker compose --env-file ./.env.development up --build mongo dev",
+    "docker:dev:down": "docker compose --env-file ./.env.development down mongo dev",
+    "docker:prod:up": "docker compose --env-file ./.env.production up --build app",
+    "docker:prod:down": "docker compose --env-file ./.env.production down app"
   },
   "dependencies": {
     "@alpinejs/collapse": "^3.13.10",
