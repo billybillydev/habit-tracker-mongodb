@@ -6,14 +6,15 @@ LABEL fly_launch_runtime="Bun"
 
 RUN npm install -g bun
 
+# Set production environment
+ENV NODE_ENV="production"
+
 WORKDIR /app
 
-# FROM base AS build
-
-# Install packages needed to build node modules
-# RUN apt-get update -qq && \
-#     apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3 curl && \
-#     curl -fsSL https://bun.sh/install | bash
+# Update package lists and install ca-certificates
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install node modules
 COPY --link bun.lockb package.json ./
@@ -24,4 +25,10 @@ RUN bun install --production
 # Copy application code
 COPY --link . .
 
-CMD ["bun", "run", "start:prod"]
+RUN bun tailwind:prod
+
+RUN bunx mix
+
+COPY --link . .
+
+CMD ["bun", "run", "src/index.tsx"]
