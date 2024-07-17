@@ -17,7 +17,7 @@ export function notificationMagic() {
     const notificationListElement = document.getElementById(notificationListId);
     if (!notificationListElement) {
       const bodyElement = document.body;
-      if (!notificationListElement) {
+      if (!bodyElement) {
         console.error("Body was not found");
         return;
       }

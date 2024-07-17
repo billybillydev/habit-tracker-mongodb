@@ -21,7 +21,6 @@ export function RegisterForm() {
       hx-target-500={`#${errorRegisterId}`}
       hx-target-4xx={`#${errorRegisterId}`}
       hx-target="main"
-      hx-push-url="/"
     >
       <p class="text-red-500 text-center text-lg" id={errorRegisterId} />
       <FormField fieldName="name" />

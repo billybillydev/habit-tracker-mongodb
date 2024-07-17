@@ -5,7 +5,7 @@ import {
   SecondaryButton,
 } from "$components/buttons.component";
 import { FormField } from "$components/fields.component";
-import { Notification } from "$components/notifications.component";
+import { Notification, notificationListId } from "$components/notifications.component";
 import { LimitPaginationRadio } from "$components/pagination.component";
 import { Habit } from "$db/models";
 import { generateDatesByNumberOfDays } from "$lib";
@@ -189,7 +189,7 @@ export function HabitComponent({
           variant="solid"
           hx-delete={`/api/habits/${item._id}`}
           hx-swap="afterbegin"
-          hx-target="#notification-list"
+          hx-target={`#${notificationListId}`}
           hx-confirm="Are you sure ?"
         />
       </div>
@@ -374,7 +374,7 @@ export function HabitsBulkDeletion() {
         x-on:click={`
           items = Array.from($manage("#habit-list").itemIdsToDelete);
           if (window.confirm("Are you sure to delete these " + nbItemsToDelete + " items ?")) {
-            htmx.ajax("DELETE", "/api/habits/bulk?" + items.map((item) => "items=" + item).join("&"), { target: "#notification-list", swap: "afterbegin" });
+            htmx.ajax("DELETE", "/api/habits/bulk?" + items.map((item) => "items=" + item).join("&"), { target: "#${notificationListId}", swap: "afterbegin" });
           }
         `}
       >

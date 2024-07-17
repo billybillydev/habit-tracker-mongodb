@@ -185,6 +185,8 @@ const registerApiController = new Hono<{ Variables: AppVariables }>().post(
       path: sessionCookie.attributes.path,
       maxAge: sessionCookie.attributes.maxAge,
     });
+
+    ctx.header("Hx-Push-Url", "/");
     
     return ctx.html(
       <HomePage
