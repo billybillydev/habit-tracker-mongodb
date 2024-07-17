@@ -1,7 +1,7 @@
 /**
  * @typedef {Object} NotificationData
  * @property {number} duration Duration of the showed notification
- * @property {Timer | number} timeout
+ * @property {Timer | undefined} timeout
  * @property {Function} resetTimeout
  * @property {Function} close
  * @property {Object.<string, Function>} closerClick
@@ -13,13 +13,13 @@
  * @param {number} duration Duration of the showed notification
  * @returns {import("alpinejs").AlpineComponent<NotificationData>} Data object returned by the function
  */
-export function notificationData(duration = 10000) {
+export function notificationData(duration) {
   return {
     duration,
-    timeout: 0,
+    timeout: undefined,
     resetTimeout() {
       clearTimeout(this.timeout);
-      this.timeout = 0;
+      this.timeout = undefined;
     },
     close() {
       this.resetTimeout();
@@ -38,10 +38,11 @@ export function notificationData(duration = 10000) {
       },
     },
     init() {
-      this.timeout = setTimeout(() => this.close(), this.duration);
+      setTimeout(() => this.close(), this.duration);
     },
     destroy() {
-      clearTimeout(this.timeout);
+      // clearTimeout(this.timeout);
+      this.resetTimeout();
     }
   };
 }

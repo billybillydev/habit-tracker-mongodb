@@ -4,8 +4,9 @@ export type Notification = {
   duration?: number;
 };
 
-export function NotificationItem({ type, message, duration }: Notification) {
+export function NotificationItem({ type, message, duration = 10000 }: Notification) {
   let colorTypeClasses = "";
+
   switch (type) {
     case "error":
       colorTypeClasses = "border-2 border-red-400 text-red-400";
@@ -23,7 +24,7 @@ export function NotificationItem({ type, message, duration }: Notification) {
   }
   return (
     <li
-      x-data={`notification("${duration}")`}
+      x-data={`notification(${duration})`}
       x-ref="notificationItem"
       x-bind="hover"
       class={[
@@ -42,10 +43,12 @@ export function NotificationItem({ type, message, duration }: Notification) {
   );
 }
 
+export const notificationListId = "notification-list";
+
 export function NotificationList() {
   return (
     <ul
-      id="notification-list"
+      id={notificationListId}
       class={
         "fixed overflow-auto grid grid-cols-1 gap-y-4 top-0 left-0 max-h-screen w-1/2 md:w-1/3 xl:w-1/4"
       }

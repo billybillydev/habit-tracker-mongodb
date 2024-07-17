@@ -1,8 +1,8 @@
 import {
-  SecondaryButton,
-  PrimaryButton,
-  InfoButton,
   DangerButton,
+  InfoButton,
+  PrimaryButton,
+  SecondaryButton,
 } from "$components/buttons.component";
 import { FormField } from "$components/fields.component";
 import { Notification } from "$components/notifications.component";
@@ -155,7 +155,10 @@ export function HabitComponent({
       <h2 class={"text-xl font-medium"}>{item.title}</h2>
       <p class="text-xs italic font-thin">
         Last update:{" "}
-        {item.updatedAt.toLocaleString("en", { dateStyle: "full", timeStyle: "long" })}
+        {item.updatedAt.toLocaleString("en", {
+          dateStyle: "full",
+          timeStyle: "long",
+        })}
       </p>
       <p class={"text-md"}>{item.description}</p>
       <HabitHistoryList habit={item} />
@@ -194,30 +197,35 @@ export function HabitComponent({
   );
 }
 
+type HabitItemNotification = {
+  itemId: string;
+  tooltipInformation?: string;
+  xNotification?: Notification;
+};
+
 export function HabitItem({
   item,
-  triggerNotification,
   class: className,
   ...restProps
 }: {
   item: Habit;
-  triggerNotification?: Notification;
+  "x-notification"?: Notification;
   class?: string;
 }) {
+  const habitItemNotificationData: HabitItemNotification = {
+    itemId: item._id?.toString() ?? "",
+    tooltipInformation: "double click on this block to switch on deletion mode",
+  };
+  if (restProps["x-notification"]) {
+    habitItemNotificationData.xNotification = restProps["x-notification"];
+  }
+
   return (
     <li
       id={`habit-${item._id}`}
       x-bind:title={"title"}
       x-data={`
-        habitItem(
-          "${item._id}",
-          "double click on this block to switch on deletion mode",
-          ${
-            triggerNotification
-              ? JSON.stringify(triggerNotification)
-              : undefined
-          }
-        )
+        habitItem(${JSON.stringify(habitItemNotificationData)})
       `}
       x-bind="doubleClick"
       {...restProps}
