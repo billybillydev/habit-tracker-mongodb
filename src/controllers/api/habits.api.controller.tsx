@@ -48,7 +48,7 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
       return html(
         <HabitItem
           item={updatedHabit}
-          triggerNotification={{
+          x-notification={{
             type: "success",
             message: "Habit updated successfully",
           }}
@@ -199,7 +199,7 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       return html(
         <HabitItem
           item={createdHabit}
-          triggerNotification={{
+          x-notification={{
             type: "success",
             message: "Habit created successfully",
           }}

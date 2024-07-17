@@ -8,7 +8,8 @@ const userSchema = new Schema({
   },
   googleId: {
     type: String,
-    unique: true, // Ensure that the googleId is unique
+    unique: false, // Not using Mongoose's unique constraint
+    sparse: true, // Allows null values to be excluded from the index
   },
   email: {
     type: String,
@@ -18,7 +19,8 @@ const userSchema = new Schema({
       validator: function (v: string) {
         return /^\w+@[a-zA-Z_]+?\.[a-zA-Z]/.test(v);
       },
-      message: ({ value }: { value: string }) => `${value} is not a valid email!`,
+      message: ({ value }: { value: string }) =>
+        `${value} is not a valid email!`,
     },
   },
   password: {
@@ -29,7 +31,7 @@ const userSchema = new Schema({
     required: [true, "Auth type is required"],
     enum: ["basic", "google"], // Restrict values to "basic" or "google"
   },
-});
+}).index({ googleId: 1 }, { unique: true, sparse: true });
 
 export type User = InferSchemaType<typeof userSchema>;
 export const User = model("User", userSchema);

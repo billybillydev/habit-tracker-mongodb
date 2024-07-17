@@ -133,7 +133,6 @@ const loginApiController = new Hono<{ Variables: AppVariables }>()
       if (!validPassword) {
         return ctx.text("Invalid email or password", 400);
       }
-      console.log("in login controller", { user })
       const session = await lucia.createSession(String(user._id), {});
       const sessionCookie = lucia.createSessionCookie(session.id);
       setCookie(ctx, sessionCookie.name, sessionCookie.value, {
@@ -186,10 +185,17 @@ const registerApiController = new Hono<{ Variables: AppVariables }>().post(
       path: sessionCookie.attributes.path,
       maxAge: sessionCookie.attributes.maxAge,
     });
+    
     return ctx.html(
-      <HomePage isHTMX={Boolean(ctx.req.header("hx-request"))} isAuth />,
-      200,
-      { "HX-Trigger": "registerSuccessNotification" }
+      <HomePage
+        isHTMX={Boolean(ctx.req.header("hx-request"))}
+        x-notification={{
+          message: "Your account has successfully been created",
+          type: "success",
+        }}
+        isAuth
+      />,
+      200
     );
   }
 );

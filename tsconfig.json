@@ -16,6 +16,8 @@
     "rootDir": ".",
     "paths": {
       "$auth": ["src/auth"],
+      "$alpine": ["src/script/alpine"],
+      "$alpine/*": ["src/script/alpine/*"],
       "$config": ["src/config"],
       "$components": ["src/components"],
       "$components/*": ["src/components/*"],
@@ -33,5 +35,5 @@
       "$lib/*": ["src/lib/*"]
     }
   },
-  "exclude": ["public", "node_modules", "src/script"]
+  "exclude": ["public", "node_modules"]
 }

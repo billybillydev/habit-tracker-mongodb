@@ -1,8 +1,8 @@
 /**
  * Type for HabitItemData function
  * @typedef {Object} HabitItemData
- * @property {import("$components/notifications.component").Notification} [triggerNotification]
- * @property {string} title
+ * @property {import("$components/notifications.component").Notification} [xNotification]
+ * @property {string} tooltipInformation
  * @property {string} itemId
  * @property {Function} addItemToSet
  * @property {Function} deleteItemFromSet
@@ -14,23 +14,20 @@
  */
 
 /**
- * @param {string} title
- * @param {string} itemId
- * @param {import("$components/notifications.component").Notification} [triggerNotification]
+ * @param {Object} props
+ * @param {string} props.tooltipInformation
+ * @param {string} props.itemId
+ * @param {import("$components/notifications.component").Notification} [props.xNotification]
  * @return {import("alpinejs").AlpineComponent<HabitItemData>}
  */
-export function habitItemData(itemId, title, triggerNotification) {
+export function habitItemData({itemId, tooltipInformation, xNotification}) {
   return {
     itemId,
-    triggerNotification,
-    title,
+    xNotification,
+    tooltipInformation,
     init() {
-      if (this.triggerNotification) {
-        htmx.ajax("POST", "/api/notifications", {
-          target: "#notification-list",
-          swap: "afterbegin",
-          values: this.triggerNotification,
-        });
+      if (this.xNotification) {
+        this.$notify(this.xNotification);
       }
     },
     addItemToSet() {
@@ -40,7 +37,7 @@ export function habitItemData(itemId, title, triggerNotification) {
       this.itemIdsToDelete.delete(this.itemId);
     },
     updateTitle(text) {
-      this.title = text;
+      this.tooltipInformation = text;
     },
     manageItemInSet() {
       if (this.itemIdsToDelete.has(this.itemId)) {

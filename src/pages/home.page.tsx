@@ -3,14 +3,14 @@ import { SecondaryButton } from "$components/buttons.component";
 import { Divider } from "$components/divider.component";
 import { Headings, SubTitle, Title } from "$components/headings.component";
 import { RootLayout } from "$components/layouts.component";
+import { Notification } from "$components/notifications.component";
 import { SEO } from "$components/seo.component";
 
-export function HomePage({
-  isAuth,
-  isHTMX,
-}: PageContext<{ isAuth?: boolean }>) {
+export function HomePage(props: PageContext<{ isAuth?: boolean; "x-notification"?: Notification }>) {
   const title = "Unleash Your Potential";
   const subTitle = "Build Lasting Habits That Stick";
+
+  const { isAuth, isHTMX } = props;
 
   return (
     <RootLayout
@@ -27,6 +27,7 @@ export function HomePage({
         class={
           "text-lg mx-auto p-2 w-full md:w-2/3 xl:w-1/2 flex flex-col gap-y-12"
         }
+        x-init={props["x-notification"] ? `$notify(${JSON.stringify(props["x-notification"])})` : null}
       >
         <p>
           Do you dream of finally achieving your goals? Whether it's mastering a
