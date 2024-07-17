@@ -1,4 +1,8 @@
-import { NotificationItem, notificationListId } from "$components/notifications.component";
+import {
+  NotificationItem,
+  NotificationList,
+  notificationListId,
+} from "$components/notifications.component";
 
 /**
  * @typedef NotifyMagic
@@ -9,16 +13,26 @@ import { NotificationItem, notificationListId } from "$components/notifications.
  * @returns {NotifyMagic}
  */
 export function notificationMagic() {
-    return (notificationData) => {
-        const notificationListElement =
-          document.getElementById(notificationListId);
-        if (!notificationListElement) {
-            console.warn(`Element with id ${notificationListId} not found`);
-            return;
-        }
-        notificationListElement.insertAdjacentHTML(
-          "afterbegin",
+  return (notificationData) => {
+    const notificationListElement = document.getElementById(notificationListId);
+    if (!notificationListElement) {
+      const bodyElement = document.body;
+      if (!notificationListElement) {
+        console.error("Body was not found");
+        return;
+      }
+      
+      bodyElement.insertAdjacentHTML(
+        "afterbegin",
+        <NotificationList>
           <NotificationItem {...notificationData} />
-        );
+        </NotificationList>
+      );
+      return;
     }
+    notificationListElement.insertAdjacentHTML(
+      "afterbegin",
+      <NotificationItem {...notificationData} />
+    );
+  };
 }

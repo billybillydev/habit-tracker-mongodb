@@ -1,10 +1,16 @@
+import { PropsWithChildren } from "hono/jsx";
+
 export type Notification = {
   type: "success" | "error" | "info" | "warning";
   message: string;
   duration?: number;
 };
 
-export function NotificationItem({ type, message, duration = 10000 }: Notification) {
+export function NotificationItem({
+  type,
+  message,
+  duration = 10000,
+}: Notification) {
   let colorTypeClasses = "";
 
   switch (type) {
@@ -45,13 +51,34 @@ export function NotificationItem({ type, message, duration = 10000 }: Notificati
 
 export const notificationListId = "notification-list";
 
-export function NotificationList() {
+export function NotificationList({ children }: PropsWithChildren) {
   return (
     <ul
       id={notificationListId}
       class={
         "fixed overflow-auto grid grid-cols-1 gap-y-4 top-0 left-0 max-h-screen w-1/2 md:w-1/3 xl:w-1/4"
       }
-    />
+      x-init={`
+        const mutationObserverConfig = { childList: true };
+        const mutationObserverCallback = (mutationList) => {
+          for (mutation of mutationList) {
+            switch(mutation.type) {
+              case "childList":
+                if ($el.children.length === 0) {
+                  $el.remove();
+                }
+                break;
+              default:
+                console.warn("mutation doesn't have a key 'type'");
+                break;
+            }
+          }
+        }
+        const observer = new MutationObserver(mutationObserverCallback);
+        observer.observe($el, mutationObserverConfig);
+      `}
+    >
+      {children}
+    </ul>
   );
 }
