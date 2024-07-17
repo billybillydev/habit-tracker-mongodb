@@ -27,7 +27,7 @@ COPY --link . .
 
 RUN bun tailwind:prod
 
-RUN bunx mix
+RUN bun build-js:prod
 
 COPY --link . .
 
