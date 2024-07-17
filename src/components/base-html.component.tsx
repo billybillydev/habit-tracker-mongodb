@@ -41,14 +41,6 @@ export function BaseHtml({
         {/* <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script> */}
       </head>
       <body class={classes} hx-ext="response-targets" x-data hx-boost="true">
-        <div
-          hx-get="/api/notifications/register/success"
-          hx-trigger="registerSuccessNotification from:body"
-          hx-target="#notification-list"
-          hx-swap="afterbegin"
-          class={"hidden"}
-        />
-        <NotificationList />
         {children}
       </body>
     </html>
