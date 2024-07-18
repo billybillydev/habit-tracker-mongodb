@@ -11,16 +11,10 @@ ENV NODE_ENV="production"
 
 WORKDIR /app
 
-# Update package lists and install ca-certificates
-RUN apt-get update && apt-get install -y \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install node modules
 COPY --link bun.lockb package.json ./
 
-# RUN bun install --ci
-RUN bun install --production
+RUN bun install --ci
 
 # Copy application code
 COPY --link . .
