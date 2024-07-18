@@ -46,15 +46,14 @@ app
   .route("/register", registerController)
   .route("/habits", habitsController)
   .route("/api", apiController)
-  .get("/404", ({ html }) => {
-    return html(<NotFoundPage />);
-  })
   .onError((err, c) => {
     console.error(err);
     return c.text("An Error occured", 500);
   })
-  .notFound(({ redirect }) => {
-    return redirect("/404");
+  .notFound((ctx) => {
+    ctx.header("HX-Retarget", "body");
+    ctx.header("HX-Reswap", "outerHTML");
+    return ctx.html(<NotFoundPage />);
   });
 
 console.log(process.env.NODE_ENV);
