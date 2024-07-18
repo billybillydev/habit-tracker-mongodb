@@ -3,6 +3,33 @@ import { Divider } from "$components/divider.component";
 import { Headings, Title } from "$components/headings.component";
 import { RootLayout } from "$components/layouts.component";
 
+function RegisterLink() {
+  return (
+    <a
+      href="/register"
+      class={
+        "text-indigo-400 text-center hover:underline hover:underline-offset-4"
+      }
+    >
+      No account ? Create one here !
+    </a>
+  );
+}
+
+function GoogleLoginLink() {
+  return (
+    <a
+      hx-get="/api/auth/login/google"
+      hx-target-4xx="#error-login"
+      class={
+        "text-green-600 text-center hover:underline hover:underline-offset-4 hover:cursor-pointer"
+      }
+    >
+      Log in with Google
+    </a>
+  );
+}
+
 export function LoginPage({ errorGoogle }: { errorGoogle?: string }) {
   return (
     <RootLayout title="Please login" class="flex flex-col p-2">
@@ -20,23 +47,8 @@ export function LoginPage({ errorGoogle }: { errorGoogle?: string }) {
         {errorGoogle ? <p class="text-red-500 text-center">{errorGoogle}</p> : null}
         <LoginForm />
         <Divider text="Or" />
-        <a
-          hx-get="/api/auth/login/google"
-          hx-target-4xx="#error-login"
-          class={
-            "text-green-600 text-center hover:underline hover:underline-offset-4"
-          }
-        >
-          Log in with Google
-        </a>
-        <a
-          href="/register"
-          class={
-            "text-indigo-400 text-center hover:underline hover:underline-offset-4"
-          }
-        >
-          No account ? Create one here !
-        </a>
+        <GoogleLoginLink />
+        <RegisterLink />
       </div>
     </RootLayout>
   );
