@@ -4,7 +4,7 @@ import { RootLayout } from "$components/layouts.component";
 export function NotFoundPage() {
   return (
     <RootLayout title="404 Not Found">
-      <section class="h-full flex flex-col gap-y-8">
+      <div class="h-full flex flex-col gap-y-8">
         <div class={"flex flex-col gap-y-4"}>
           <Headings>
             <a href="/">
@@ -14,9 +14,9 @@ export function NotFoundPage() {
           <hr />
         </div>
         <div class="h-full w-full flex items-center justify-center">
-            <p class="text-2xl">Sorry, we didn't find the page you are looking for :(</p>
+          <p class="text-2xl">Sorry, we didn't find the page you are looking for :(</p>
         </div>
-      </section>
+      </div>
     </RootLayout>
   );
 }
