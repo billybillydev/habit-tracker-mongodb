@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import clsx from "clsx";
 
 export type ButtonProps = JSX.HtmlButtonTag & Partial<JSX.ElementChildrenAttribute> & {
   text?: string;
@@ -11,7 +11,7 @@ export function Button({
   class: className,
   ...restProps
 }: ButtonProps) {
-  const classes = classNames(
+  const classes = clsx(
     "px-3 py-2 border border-transparent rounded disabled:cursor-not-allowed",
     className
   );
@@ -32,7 +32,7 @@ export function PrimaryButton({
     <Button
       text={text}
       children={children}
-      class={classNames(
+      class={clsx(
         "border-white hover:bg-white hover:text-zinc-900",
         className
       )}
@@ -84,7 +84,7 @@ export function DangerButton({
     <Button
       text={text}
       children={children}
-      class={classNames(
+      class={clsx(
         variant
           ? "text-red-600 hover:bg-red-600 hover:text-white"
           : "hover:text-red-600",

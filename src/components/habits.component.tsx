@@ -12,7 +12,7 @@ import {
 import { LimitPaginationRadio } from "$components/pagination.component";
 import { Habit } from "$db/models";
 import { generateDatesByNumberOfDays } from "$lib";
-import classNames from "classnames";
+import clsx from "clsx";
 
 export type HabitsProps = { habits: Habit[] };
 
@@ -149,7 +149,7 @@ export function HabitComponent({
 }) {
   return (
     <section
-      class={classNames(
+      class={clsx(
         "h-full rounded-md border border-slate-300 p-5 flex flex-col gap-y-4 max-w-xl &>p:text-slate-400",
         className
       )}
