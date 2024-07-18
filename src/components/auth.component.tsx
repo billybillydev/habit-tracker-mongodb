@@ -6,7 +6,7 @@ export function LoginForm() {
   return (
     <form hx-post="/api/auth/login" hx-target-500={`#${errorLoginId}`} hx-target-4xx={`#${errorLoginId}`}>
       <p class="text-red-500 text-center text-lg" id={errorLoginId} />
-      <FormField fieldName="email" type="email" />
+      <FormField fieldName="email" type="email" focus />
       <FormField fieldName="password" type="password" />
       <PrimaryButton text="Log In" />
     </form>
@@ -23,7 +23,7 @@ export function RegisterForm() {
       hx-target="main"
     >
       <p class="text-red-500 text-center text-lg" id={errorRegisterId} />
-      <FormField fieldName="name" />
+      <FormField fieldName="name" focus />
       <FormField fieldName="email" type="email" />
       <FormField fieldName="password" type="password" />
       <PrimaryButton text="Submit" />
