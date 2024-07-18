@@ -3,6 +3,19 @@ import { Divider } from "$components/divider.component";
 import { Headings, Title } from "$components/headings.component";
 import { RootLayout } from "$components/layouts.component";
 
+function LoginLink() {
+  return (
+    <a
+      href="/login"
+      class={
+        "text-neutral-100 text-center hover:underline hover:underline-offset-4"
+      }
+    >
+      Already an account ? Log in here !
+    </a>
+  );
+}
+
 export function RegisterPage() {
   return (
     <RootLayout title="Create an account" class="flex flex-col p-2">
@@ -19,14 +32,7 @@ export function RegisterPage() {
         <h2 class={"text-2xl text-center"}>Sign up</h2>
         <RegisterForm />
         <Divider text="Or" />
-        <a
-          href="/login"
-          class={
-            "text-neutral-100 text-center hover:underline hover:underline-offset-4"
-          }
-        >
-          Already an account ? Log in here !
-        </a>
+        <LoginLink />
       </div>
     </RootLayout>
   );
