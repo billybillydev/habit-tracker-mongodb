@@ -226,7 +226,7 @@ export function HabitItem({
   return (
     <li
       id={`habit-${item._id}`}
-      x-bind:title={"title"}
+      x-bind:title={"tooltipInformation"}
       x-data={`
         habitItem(${JSON.stringify(habitItemNotificationData)})
       `}
