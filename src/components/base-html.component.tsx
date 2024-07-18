@@ -39,7 +39,7 @@ export function BaseHtml({
         <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
         {/* <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script> */}
       </head>
-      <body class={classes} hx-ext="response-targets" x-data hx-boost="true">
+      <body class={classes} hx-ext="response-targets" x-data>
         {children}
       </body>
     </html>

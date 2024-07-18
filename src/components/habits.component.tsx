@@ -113,7 +113,9 @@ export function CreateHabitButton() {
       class={
         "p-4 text-center border rounded-xl hover:bg-slate-300 hover:text-slate-700 w-full md:w-3/4 mx-auto text-3xl flex gap-x-4 items-center justify-center"
       }
-      x-on:click={"showForm = true"}
+      x-on:click={`
+        showForm = true;
+      `}
     >
       <span>Add Habit</span>
       <span
@@ -129,13 +131,15 @@ export function CreateHabitButton() {
 
 export function CreateHabitComponent() {
   return (
-    <div x-data="{ showForm: false }">
-      <template x-if="!showForm">
+    <div
+      x-data="{ showForm: false }"
+    >
+      <div x-show="!showForm">
         <CreateHabitButton />
-      </template>
-      <template x-if="showForm">
+      </div>
+      <div x-show="showForm">
         <CreateHabitForm />
-      </template>
+      </div>
     </div>
   );
 }
