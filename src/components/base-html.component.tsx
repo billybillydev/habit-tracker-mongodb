@@ -1,6 +1,5 @@
 import { SessionUser } from "$auth";
-import { NotificationList } from "$components/notifications.component";
-import classNames from "classnames";
+import clsx from "clsx";
 
 export type HTMLProps = JSX.ElementChildrenAttribute & {
   title: string;
@@ -18,7 +17,7 @@ export function BaseHtml({
   isHTMX,
   class: className,
 }: HTMLProps) {
-  const classes = classNames(
+  const classes = clsx(
     "bg-slate-900 text-white relative min-h-screen",
     className
   );
