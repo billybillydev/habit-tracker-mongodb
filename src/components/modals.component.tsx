@@ -1,5 +1,4 @@
 import { EditHabitForm, EditHabitProps } from "$components/habits.component";
-import { Habit } from "$db/models";
 
 export type ModalProps = { children: JSX.Element | JSX.Element[]; ref: string };
 

@@ -1,5 +1,6 @@
 export type FormFieldProps = JSX.HtmlInputTag & {
   fieldName: string;
+  focus?: boolean;
 };
 
 export function FormField({
@@ -7,6 +8,7 @@ export function FormField({
   type,
   value,
   class: className,
+  focus,
   ...rest
 }: FormFieldProps) {
   const classes = [
@@ -25,6 +27,7 @@ export function FormField({
         type={type || "text"}
         value={value || ""}
         required="true"
+        x-init={focus ? `$el.focus()` : null}
         {...rest}
       />
     </div>

@@ -5,7 +5,10 @@ import {
   SecondaryButton,
 } from "$components/buttons.component";
 import { FormField } from "$components/fields.component";
-import { Notification, notificationListId } from "$components/notifications.component";
+import {
+  Notification,
+  notificationListId,
+} from "$components/notifications.component";
 import { LimitPaginationRadio } from "$components/pagination.component";
 import { Habit } from "$db/models";
 import { generateDatesByNumberOfDays } from "$lib";
@@ -36,7 +39,7 @@ export function CreateHabitForm() {
       class={"flex flex-col gap-y-4 border p-8 rounded-xl max-w-3xl mx-auto"}
     >
       <div class={"flex items-center gap-x-8 w-full"}>
-        <FormField class="w-2/3" fieldName="title" />
+        <FormField class="w-2/3" fieldName="title" focus />
         <FormField class="w-1/3" fieldName="color" type="color" />
       </div>
       <FormField fieldName="description" />
@@ -89,7 +92,7 @@ export function EditHabitForm({
       `}
       class={"flex flex-col gap-y-4 border p-8 rounded-xl w-full mx-auto"}
     >
-      <FormField fieldName="title" value={title} />
+      <FormField fieldName="title" value={title} focus />
       <FormField fieldName="description" value={description} />
       <p class="text-red-500 p-2 text-center" id={editHabitErrorMessageId} />
       <div class={"flex items-center justify-center gap-x-8"}>
@@ -110,7 +113,7 @@ export function CreateHabitButton() {
       class={
         "p-4 text-center border rounded-xl hover:bg-slate-300 hover:text-slate-700 w-full md:w-3/4 mx-auto text-3xl flex gap-x-4 items-center justify-center"
       }
-      x-on:click="showForm = true"
+      x-on:click={"showForm = true"}
     >
       <span>Add Habit</span>
       <span
@@ -127,12 +130,12 @@ export function CreateHabitButton() {
 export function CreateHabitComponent() {
   return (
     <div x-data="{ showForm: false }">
-      <div x-show="!showForm">
+      <template x-if="!showForm">
         <CreateHabitButton />
-      </div>
-      <div x-show="showForm">
+      </template>
+      <template x-if="showForm">
         <CreateHabitForm />
-      </div>
+      </template>
     </div>
   );
 }
