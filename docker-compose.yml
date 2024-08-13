@@ -5,9 +5,10 @@ services:
       context: .
       # target: production
       dockerfile: Dockerfile.production
-   
+    env_file:
+      - .env.production
     ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
+      - 3001:3001
     volumes:
       - ./:/app
       - /app/node_modules
@@ -21,23 +22,25 @@ services:
       context: .
       # target: development
       dockerfile: Dockerfile.development
+    env_file:
+      - .env.development
     ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
+      - 3000:3000
     volumes:
       - ./:/app
       - /app/node_modules
-    environment:
-      NODE_ENV: development
     depends_on:
       - mongo
     networks:
       - node-network
 
   mongo:
-    image: mongo:6-jammy
-    container_name: ${DATABASE_HOST}
+    image: mongo:latest
+    container_name: mongo_dev
+    env_file:
+      - .env.development
     ports:
-      - ${DATABASE_PORT}:${DATABASE_PORT}
+      - 27017:27017
     volumes:
       - mongo-data:/data/db
     networks:

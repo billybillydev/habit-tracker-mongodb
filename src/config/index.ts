@@ -16,15 +16,14 @@ export const env = createEnv({
     GOOGLE_REDIRECT_URI_PATH: z.string(),
     HOST_URL: z.string().min(1),
     SERVER_PORT: z.coerce.number(),
+    DATABASE_URL: z.string(),
   },
   runtimeEnv: process.env,
 });
 
-const devMongoURI = `mongodb://${env.DATABASE_HOST}:${env.DATABASE_PORT}/?authSource=admin`;
-const prodMongoURI = `mongodb+srv://${env.MONGO_INITDB_ROOT_USERNAME}:${env.MONGO_INITDB_ROOT_PASSWORD}@${env.DATABASE_HOST}/?retryWrites=true&w=majority&appName=${env.DATABASE_CLUSTER}`;
 export const config = {
   db: {
-    url: env.NODE_ENV === "production" ? prodMongoURI : devMongoURI,
+    url: env.DATABASE_URL,
   },
   google: {
     credentials: {

@@ -6,9 +6,6 @@ LABEL fly_launch_runtime="Bun"
 
 RUN npm install -g bun
 
-# Set production environment
-ENV NODE_ENV="production"
-
 WORKDIR /app
 
 # Install node modules
