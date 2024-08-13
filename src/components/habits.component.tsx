@@ -6,8 +6,7 @@ import {
 } from "$components/buttons.component";
 import { FormField } from "$components/fields.component";
 import {
-  Notification,
-  notificationListId,
+  Notification
 } from "$components/notifications.component";
 import { LimitPaginationRadio } from "$components/pagination.component";
 import { Habit } from "$db/models";
@@ -17,13 +16,13 @@ import clsx from "clsx";
 export type HabitsProps = { habits: Habit[] };
 
 export function CreateHabitForm() {
-  const targetId = "habit-list";
+  const targetId = "habit-container";
   const createHabitErrorMessageId = "create-habit-error";
   const createHabitFormRef = "create-habit-form";
   return (
     <form
       hx-post="/api/habits"
-      hx-swap={`afterbegin`}
+      hx-swap={`outerHTML`}
       hx-target={`#${targetId}`}
       hx-target-4xx={`#${createHabitErrorMessageId}`}
       hx-target-5xx={`#${createHabitErrorMessageId}`}
@@ -68,7 +67,7 @@ export type EditHabitProps = {
   title: Habit["title"];
   description: Habit["description"];
   modalRef: string;
-};
+}
 export function EditHabitForm({
   title,
   description,
@@ -223,9 +222,6 @@ export function HabitItem({
     itemId: item._id?.toString() ?? "",
     tooltipInformation: "double click on this block to switch on deletion mode",
   };
-  if (restProps["x-notification"]) {
-    habitItemNotificationData.xNotification = restProps["x-notification"];
-  }
 
   return (
     <li
