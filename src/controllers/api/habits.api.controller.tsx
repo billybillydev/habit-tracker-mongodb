@@ -46,13 +46,18 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
       }
 
       return html(
-        <HabitItem
-          item={updatedHabit}
-          x-notification={{
-            type: "success",
-            message: "Habit updated successfully",
-          }}
-        />
+        <>
+          <span
+            x-init={`
+              $notify(${JSON.stringify({
+                type: "success",
+                message: "Habit updated successfully",
+              })});
+              $el.remove();
+            `}
+          />
+          <HabitItem item={updatedHabit} />
+        </>
       );
     }
   )
@@ -93,7 +98,8 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
 
       return html(
         <>
-          <span x-init={`
+          <span
+            x-init={`
               $notify(${JSON.stringify(notification)})
               $el.remove();
             `}
@@ -149,8 +155,11 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
     ),
     async ({ html, req }) => {
       const { date, id } = req.valid("param");
-      const updatedExistingHabit = await habitService.updateDateInHistory(id, date);
-      
+      const updatedExistingHabit = await habitService.updateDateInHistory(
+        id,
+        date
+      );
+
       return html(
         <HabitHistoryItem
           habit={updatedExistingHabit}
@@ -358,56 +367,56 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
       />
     );
   })
-.delete(
-  "/bulk",
-  zValidator("query", z.object({ items: z.array(z.string()) })),
-  async ({ req, html, get }) => {
-    const { items } = req.valid("query");
-    const deletedResults = await habitService.deleteBulkIds(items);
-    const notification: Notification = {
-      type: "success",
-      message: `${deletedResults.deletedCount} selected habits deleted successfully`,
-    };
-    
-    // Refetch new habit list
-    const url = getURL(req);
-    const { limit, page, search } = getPaginationQueries(url);
-    const sessionUser = get("sessionUser");
-    const [habits, count] = await executeHandlerForSessionUser(
-      async (user) =>
-        search
-          ? await habitService.findManyWithCountByTitle(
-              search,
-              user.id,
-              page > 1 ? page * limit : limit
-            )
-          : await habitService.findManyWithCountByUserId(
-              user.id,
-              page > 1 ? page * limit : limit
-            ),
-      sessionUser
-    );
+  .delete(
+    "/bulk",
+    zValidator("query", z.object({ items: z.array(z.string()) })),
+    async ({ req, html, get }) => {
+      const { items } = req.valid("query");
+      const deletedResults = await habitService.deleteBulkIds(items);
+      const notification: Notification = {
+        type: "success",
+        message: `${deletedResults.deletedCount} selected habits deleted successfully`,
+      };
 
-    return html(
-      <>
-        <span
-          x-init={`
+      // Refetch new habit list
+      const url = getURL(req);
+      const { limit, page, search } = getPaginationQueries(url);
+      const sessionUser = get("sessionUser");
+      const [habits, count] = await executeHandlerForSessionUser(
+        async (user) =>
+          search
+            ? await habitService.findManyWithCountByTitle(
+                search,
+                user.id,
+                page > 1 ? page * limit : limit
+              )
+            : await habitService.findManyWithCountByUserId(
+                user.id,
+                page > 1 ? page * limit : limit
+              ),
+        sessionUser
+      );
+
+      return html(
+        <>
+          <span
+            x-init={`
               $notify(${JSON.stringify(notification)})
               $el.remove();
             `}
-        />
-        {habits.length || search ? (
-          <HabitContainer
-            count={count}
-            habits={habits}
-            limit={limit}
-            searchValue={search}
           />
-        ) : (
-          <NoHabits />
-        )}
-      </>
-    );
-  }
-)
-.route("/:id", habitIdApiController);
+          {habits.length || search ? (
+            <HabitContainer
+              count={count}
+              habits={habits}
+              limit={limit}
+              searchValue={search}
+            />
+          ) : (
+            <NoHabits />
+          )}
+        </>
+      );
+    }
+  )
+  .route("/:id", habitIdApiController);
