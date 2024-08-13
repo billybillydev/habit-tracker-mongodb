@@ -223,15 +223,12 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
         return text("Please select another color than black", 400);
       }
 
-      const [createdHabit, habitsCount] = await executeHandlerForSessionUser(
+      const createdHabit = await executeHandlerForSessionUser(
         async (user) =>
-          Promise.all([
-            habitService.create({
-              ...body,
-              userId: user.id,
-            }),
-            habitService.count(user.id),
-          ]),
+          habitService.create({
+            ...body,
+            userId: user.id,
+          }),
         sessionUser
       );
 
@@ -239,19 +236,49 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
         res.headers.append("HX-Reswap", "innerHTML");
         return text("An error occured", 500);
       }
-      if (habitsCount === 0) {
-        res.headers.append("HX-Reswap", "outerHTML");
-        return html(<HabitList habits={[createdHabit]} />, 201);
-      }
+
+      const notification: Notification = {
+        type: "success",
+        message: "Habit created successfully",
+      };
+
+      // Refetch new habit list
+      const url = getURL(req);
+      const { limit, page, search } = getPaginationQueries(url);
+      const [habits, count] = await executeHandlerForSessionUser(
+        async (user) =>
+          search
+            ? await habitService.findManyWithCountByTitle(
+                search,
+                user.id,
+                page > 1 ? page * limit : limit
+              )
+            : await habitService.findManyWithCountByUserId(
+                user.id,
+                page > 1 ? page * limit : limit
+              ),
+        sessionUser
+      );
+
       return html(
-        <HabitItem
-          item={createdHabit}
-          x-notification={{
-            type: "success",
-            message: "Habit created successfully",
-          }}
-        />,
-        201
+        <>
+          <span
+            x-init={`
+              $notify(${JSON.stringify(notification)})
+              $el.remove();
+            `}
+          />
+          {habits.length || search ? (
+            <HabitContainer
+              count={count}
+              habits={habits}
+              limit={limit}
+              searchValue={search}
+            />
+          ) : (
+            <NoHabits />
+          )}
+        </>
       );
     }
   )
