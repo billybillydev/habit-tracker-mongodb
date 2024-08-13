@@ -11,7 +11,4 @@ COPY --link bun.lockb package.json ./
 
 RUN bun install
 
-ENV SERVER_PORT 3000
-EXPOSE $SERVER_PORT
-
 CMD ["bun", "run", "start:dev"]

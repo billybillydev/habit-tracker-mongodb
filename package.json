@@ -10,10 +10,12 @@
     "build-js:prod": "bun build src/script/app.js --outfile=public/script/app.js --minify",
     "start:dev": "concurrently \"bun dev\" \"bun tailwind:dev\" \"bun build-js:dev\"",
     "start:prod": "bun tailwind:prod && bun build-js:prod && NODE_ENV=production bun run src/index.tsx",
-    "docker:dev:up": "docker compose --env-file ./.env.development up --build mongo dev",
-    "docker:dev:down": "docker compose --env-file ./.env.development down mongo dev",
-    "docker:prod:up": "docker compose --env-file ./.env.production up --build app",
-    "docker:prod:down": "docker compose --env-file ./.env.production down app",
+    "docker:mongo:up": "docker-compose up --build mongo",
+    "docker:mongo:down": "docker-compose down mongo",
+    "docker:dev:up": "bun docker:mongo:up -d && docker-compose up --build dev",
+    "docker:dev:down": "docker-compose down mongo dev",
+    "docker:prod:up": "docker-compose up --build app",
+    "docker:prod:down": "docker-compose down app",
     "fly:deploy": "flyctl deploy --dockerfile Dockerfile.production"
   },
   "dependencies": {

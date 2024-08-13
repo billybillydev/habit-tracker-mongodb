@@ -1,5 +1,4 @@
-import { config } from "$config";
-import { env } from "bun";
+import { config, env } from "$config";
 import { connect, disconnect, set } from "mongoose";
 
 export const connectDB = async () => {
@@ -7,7 +6,8 @@ export const connectDB = async () => {
     if (env.NODE_ENV === "development") {
       set("debug", true);
     }
-    await connect(config.db.url);
+    await connect(config.db.url, {
+    });
     console.log("Connected to MongoDB");
   } catch (err) {
     console.error("Error connecting to MongoDB", err);
@@ -17,9 +17,9 @@ export const connectDB = async () => {
 export const disconnectDB = async () => {
   try {
     await disconnect();
-    console.log('Disconnected from MongoDB');
+    console.log("Disconnected from MongoDB");
   } catch (err) {
-    console.error('Error disconnecting from MongoDB', err);
+    console.error("Error disconnecting from MongoDB", err);
   }
 };
 
