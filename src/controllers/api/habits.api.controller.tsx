@@ -46,13 +46,18 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
       }
 
       return html(
-        <HabitItem
-          item={updatedHabit}
-          x-notification={{
-            type: "success",
-            message: "Habit updated successfully",
-          }}
-        />
+        <>
+          <span
+            x-init={`
+              $notify(${JSON.stringify({
+                type: "success",
+                message: "Habit updated successfully",
+              })});
+              $el.remove();
+            `}
+          />
+          <HabitItem item={updatedHabit} />
+        </>
       );
     }
   )
