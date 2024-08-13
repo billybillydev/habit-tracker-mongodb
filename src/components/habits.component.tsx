@@ -195,8 +195,8 @@ export function HabitComponent({
           text="Delete"
           variant="solid"
           hx-delete={`/api/habits/${item._id}`}
-          hx-swap="afterbegin"
-          hx-target={`#${notificationListId}`}
+          hx-swap="outerHTML"
+          hx-target={`#habit-container`}
           hx-confirm="Are you sure ?"
         />
       </div>
@@ -381,7 +381,7 @@ export function HabitsBulkDeletion() {
         x-on:click={`
           items = Array.from($manage("#habit-list").itemIdsToDelete);
           if (window.confirm("Are you sure to delete these " + nbItemsToDelete + " items ?")) {
-            htmx.ajax("DELETE", "/api/habits/bulk?" + items.map((item) => "items=" + item).join("&"), { target: "#${notificationListId}", swap: "afterbegin" });
+            htmx.ajax("DELETE", "/api/habits/bulk?" + items.map((item) => "items=" + item).join("&"), { target: "#habit-container", swap: "outerHTML" });
           }
         `}
       >
