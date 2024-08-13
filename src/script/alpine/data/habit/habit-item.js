@@ -17,19 +17,12 @@
  * @param {Object} props
  * @param {string} props.tooltipInformation
  * @param {string} props.itemId
- * @param {import("$components/notifications.component").Notification} [props.xNotification]
  * @return {import("alpinejs").AlpineComponent<HabitItemData>}
  */
-export function habitItemData({itemId, tooltipInformation, xNotification}) {
+export function habitItemData({itemId, tooltipInformation}) {
   return {
     itemId,
-    xNotification,
     tooltipInformation,
-    init() {
-      if (this.xNotification) {
-        this.$notify(this.xNotification);
-      }
-    },
     addItemToSet() {
       this.itemIdsToDelete.add(this.itemId);
     },
