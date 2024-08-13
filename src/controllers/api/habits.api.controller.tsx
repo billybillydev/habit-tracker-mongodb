@@ -63,15 +63,53 @@ export const habitIdApiController = new Hono<{ Variables: AppVariables }>()
         id: z.string(),
       })
     ),
-    async ({ req, html, res }) => {
+    async ({ req, html, get }) => {
       const { id } = req.valid("param");
+      // Delete selected element
       await habitService.deleteById(id);
       const notification: Notification = {
         type: "success",
         message: "Habit deleted successfully",
       };
-      res.headers.append("HX-Trigger", "load-habits");
-      return html(<NotificationItem {...notification} />);
+
+      // Refetch new habit list
+      const url = getURL(req);
+      const { limit, page, search } = getPaginationQueries(url);
+      const sessionUser = get("sessionUser");
+      const [habits, count] = await executeHandlerForSessionUser(
+        async (user) =>
+          search
+            ? await habitService.findManyWithCountByTitle(
+                search,
+                user.id,
+                page > 1 ? page * limit : limit
+              )
+            : await habitService.findManyWithCountByUserId(
+                user.id,
+                page > 1 ? page * limit : limit
+              ),
+        sessionUser
+      );
+
+      return html(
+        <>
+          <span x-init={`
+              $notify(${JSON.stringify(notification)})
+              $el.remove();
+            `}
+          />
+          {habits.length || search ? (
+            <HabitContainer
+              count={count}
+              habits={habits}
+              limit={limit}
+              searchValue={search}
+            />
+          ) : (
+            <NoHabits />
+          )}
+        </>
+      );
     }
   )
   .get(
@@ -323,16 +361,53 @@ export const habitApiController = new Hono<{ Variables: AppVariables }>()
 .delete(
   "/bulk",
   zValidator("query", z.object({ items: z.array(z.string()) })),
-  async ({ req, html, res }) => {
+  async ({ req, html, get }) => {
     const { items } = req.valid("query");
-    const deletedResultCount = await habitService.deleteBulkIds(items);
+    const deletedResults = await habitService.deleteBulkIds(items);
     const notification: Notification = {
       type: "success",
-      message: deletedResultCount + "selected habits deleted successfully",
+      message: `${deletedResults.deletedCount} selected habits deleted successfully`,
     };
-    res.headers.append("HX-Trigger", "load-habits");
     
-    return html(<NotificationItem {...notification} />);
+    // Refetch new habit list
+    const url = getURL(req);
+    const { limit, page, search } = getPaginationQueries(url);
+    const sessionUser = get("sessionUser");
+    const [habits, count] = await executeHandlerForSessionUser(
+      async (user) =>
+        search
+          ? await habitService.findManyWithCountByTitle(
+              search,
+              user.id,
+              page > 1 ? page * limit : limit
+            )
+          : await habitService.findManyWithCountByUserId(
+              user.id,
+              page > 1 ? page * limit : limit
+            ),
+      sessionUser
+    );
+
+    return html(
+      <>
+        <span
+          x-init={`
+              $notify(${JSON.stringify(notification)})
+              $el.remove();
+            `}
+        />
+        {habits.length || search ? (
+          <HabitContainer
+            count={count}
+            habits={habits}
+            limit={limit}
+            searchValue={search}
+          />
+        ) : (
+          <NoHabits />
+        )}
+      </>
+    );
   }
 )
 .route("/:id", habitIdApiController);
